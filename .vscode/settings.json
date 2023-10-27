@@ -1,0 +1,7 @@
+{
+    "C_Cpp.default.compileCommands": "build/compile_commands.json",
+    "files.associations": {
+        "stdio.h": "c",
+        "callback.h": "c"
+    }
+}
