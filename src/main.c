@@ -6,10 +6,8 @@ int main()
 
     win = glInit();
     
-    while(!glfwWindowShouldClose(win))
-    {
-        glfwPollEvents();
-    } 
+    uint8_t code = rendererSetup();
+    renderLoop(win);
 
     return 0;
 }
