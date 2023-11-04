@@ -1,0 +1,4 @@
+option('cglm_path', type: 'string', value: 'defaultval', description: 'path to cglm folder')
+option('glfw_path', type: 'string', value: 'defaultval', description: 'path to glfw folder')
+option('glfw_lib_option', type: 'string', value: 'defaultval', description: 'which version of the glfw lib to use')
+
