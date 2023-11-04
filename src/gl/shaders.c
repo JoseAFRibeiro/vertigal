@@ -34,11 +34,11 @@ GLuint compileShader(const char* path, GLenum shaderType)
     if(success == GL_FALSE)
     {
         if(logSize > INFO_LOG_SIZE)
-            warn("Shader compilation log is larger than buffer");
+            vg_warn("Shader compilation error is larger than buffer");
 
         glGetShaderInfoLog(shader, INFO_LOG_SIZE, NULL, iLog);
 
-        error(iLog);
+        vg_error(iLog);
         free(buffer);
         return 0;
     }
@@ -72,7 +72,7 @@ GLuint compileShaderProgram(VG_shader_packet p)
     if(success == GL_FALSE)
     {
         if(logSize > INFO_LOG_SIZE)
-            warn("Linking log is larger than buffer");
+            vg_warn("Linking error is larger than buffer");
 
         glGetProgramInfoLog(program, INFO_LOG_SIZE, &logSize, iLog);
         glDeleteShader(p.fragment);

@@ -4,9 +4,9 @@
 #include <stdlib.h>
 
 char* readFileToBuffer(size_t* size, const char* path);
-void warn(char* msg);
-void log(char* msg);
-void error(char*msg);
+void vg_warn(char* msg);
+void vg_log(char* msg);
+void vg_error(char*msg);
 
 
 #endif 
