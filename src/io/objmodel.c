@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <errno.h>
 #include <string.h>
 #include <stdlib.h>
 #include "vertigal/models.h"
@@ -69,22 +68,23 @@ void vertexToFloatArray(VG_3D_ENTITY *ent, char* restrict buffer, uint32_t verte
     
 }
 
-VG_3D_ENTITY secondPassParse(VG_3D_MODEL_ATTRIBUTES attrib, FILE* f)
+VG_3D_ENTITY secondPassParse(VG_3D_MODEL_ATTRIBUTES attrib, file_buffer_t* restrict fb)
 {
     char* buffer;
+    bool quit = false;
     uint16_t compBuffer;
     size_t lineLen;
     ssize_t size;
     uint32_t vertIndex = 0;
     VG_3D_ENTITY ent;
-
+    
     ent.vertexArray = malloc(sizeof(VG_3D_VERTEX) * attrib.numVertices);
 
-    while(vertIndex < attrib.numVertices)
+    while(vertIndex < attrib.numVertices && !quit)
     {
         buffer = NULL;
         
-        size = getline(&buffer, &lineLen, f);
+        size = VG_getline(&buffer, &lineLen, fb, &quit);
 
         compBuffer = buffer[0];
         compBuffer =compBuffer << 8;
@@ -108,30 +108,29 @@ VG_3D_ENTITY secondPassParse(VG_3D_MODEL_ATTRIBUTES attrib, FILE* f)
             break;
         }
 
-
         free(buffer);
         compBuffer = 0;
     }
 }
 
 
-VG_3D_MODEL_ATTRIBUTES firstPassParse(FILE* f)
+VG_3D_MODEL_ATTRIBUTES firstPassParse(file_buffer_t* restrict fb)
 {
     char* buffer;
+    bool quit = false;
     uint16_t compBuffer;
-
     size_t lineLen;
     ssize_t size;
     VG_3D_MODEL_ATTRIBUTES att = {0};
     
-    while(!feof(f))
+    while(!quit)
     {   
         buffer = NULL;
         
-        size = getline(&buffer, &lineLen, f);
+        size = VG_getline(&buffer, &lineLen, fb, &quit);
 
         compBuffer = buffer[0];
-        compBuffer =compBuffer << 8;
+        compBuffer = compBuffer << 8;
         compBuffer = compBuffer | buffer[1];
 
         switch (compBuffer)
@@ -154,25 +153,26 @@ VG_3D_MODEL_ATTRIBUTES firstPassParse(FILE* f)
         free(buffer);
         compBuffer = 0;
     }
-    rewind(f);
+
+    fb->__cursor = 0;
     return att;
 }
 
-VG_3D_ENTITY loadModelFromObj(const char* path)
+VG_3D_ENTITY loadModelFromObj(const char* restrict path)
 {
     char* buffer;
     size_t lineLen;
     ssize_t size;
-    FILE* f;
     VG_3D_ENTITY entity;
     VG_3D_MODEL_ATTRIBUTES attrib;
     VG_3D_ENTITY ent;
-    
-    f = fopen(path, "rb");
-    
-        
-    attrib = firstPassParse(f);
-    ent = secondPassParse(attrib, f);
+    file_buffer_t fb;
+
+    fb.__cursor = 0;
+    fb.buffer = readFileToBuffer(&lineLen, path);
+
+    attrib = firstPassParse(&fb);
+    ent = secondPassParse(attrib, &fb);
 
     return ent;
 }

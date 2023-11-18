@@ -20,6 +20,7 @@ uint8_t rendererSetup(void)
 void renderLoop(GLFWwindow* win)
 {
 
+    loadModelFromObj("./res/cube.obj");
 
     while(!glfwWindowShouldClose(win))
     {   
