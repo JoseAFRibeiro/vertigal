@@ -1,4 +1,4 @@
-project('vertigal', 'c', default_options: ['c_std=17'])
+project('vertigal', 'c', default_options: ['c_std=c17'])
 
 compiler = meson.get_compiler('c')
 sys = build_machine.system()

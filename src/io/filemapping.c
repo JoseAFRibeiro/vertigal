@@ -42,5 +42,6 @@ char* readFileToBuffer(size_t* size, const char* path)
     }
 
     fclose(f);
+    buffer[*size] = '\0';
     return buffer;
 }

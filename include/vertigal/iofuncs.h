@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <sys/types.h>
 #include "files.h"
 
 char* readFileToBuffer(size_t* size, const char* path);

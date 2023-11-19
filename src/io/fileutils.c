@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <malloc.h>
+#include <stddef.h>
 #include "vertigal/iofuncs.h"
 
 /***
@@ -17,8 +18,15 @@
  * bugs
  ***/
 
+static uint32_t counter = 0;
+
 ssize_t VG_getline(char** restrict lineptr, size_t* restrict n, file_buffer_t* restrict fb, bool* isEOF)
 {
+    counter++;
+    if(counter == 33)
+    {
+        counter--;
+    }
     if(lineptr == NULL)
         return -1;
     
@@ -33,7 +41,7 @@ ssize_t VG_getline(char** restrict lineptr, size_t* restrict n, file_buffer_t* r
 
     for(lnCursor; ;lnCursor++)
     {
-        if((fb->buffer[fbCursorStart + lnCursor] == '\n') | (fb->buffer[fbCursorStart + lnCursor] == '\0') )
+        if((fb->buffer[fbCursorStart + lnCursor] == '\n') || (fb->buffer[fbCursorStart + lnCursor] == '\0') )
         {
             if(*lineptr == NULL)
             {
@@ -44,7 +52,7 @@ ssize_t VG_getline(char** restrict lineptr, size_t* restrict n, file_buffer_t* r
                 fb->__cursor = fbCursorStart + lnCursor + 1;
             }
             
-            if(fb->buffer[lnCursor] == '\0')
+            if(fb->buffer[fbCursorStart + lnCursor] == '\0')
                 *isEOF = true;
 
             break;
@@ -59,7 +67,7 @@ ssize_t VG_getline(char** restrict lineptr, size_t* restrict n, file_buffer_t* r
         #ifdef _win32
         uint32_t size = _msize(*lineptr);
         #endif
-    *lineptr[lnCursor] = '\0';
+    (*lineptr)[lnCursor] = '\0';
     vg_log(*lineptr);
     #endif
     return lnCursor;

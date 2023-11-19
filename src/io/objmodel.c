@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include "vertigal/models.h"
 #include "vertigal/iofuncs.h"
 
