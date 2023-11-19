@@ -3,6 +3,8 @@
 #include <GLFW/glfw3.h>
 #include "vertigal/glfuncs.h"
 #include "vertigal/glstrcuts.h"
+#include "vertigal/models.h"
+
 
 uint8_t rendererSetup(void)
 {
@@ -21,7 +23,7 @@ void renderLoop(GLFWwindow* win)
 {
 
     loadModelFromObj("./res/cube.obj");
-
+    
     while(!glfwWindowShouldClose(win))
     {   
         glfwPollEvents();

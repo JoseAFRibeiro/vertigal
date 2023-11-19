@@ -38,26 +38,30 @@ void parseLine(const char* restrict line, VG_3D_ENTITY* ent)
 void vertexToFloatArray(VG_3D_ENTITY *ent, char* restrict buffer, uint32_t vertexIndex)
 {   
     uint8_t cursor = 0;
+    uint8_t posIndex = 0;
     uint8_t slice_begin;
     uint8_t slice_end;
-    char tempBuffer[1024];
+    char tempBuffer[100];
 
-    for(int i = 0 ; ; i++)
+    while(true)
     {
 
         if((buffer[cursor] >= '0') && (buffer[cursor] <= '9'))
         {
             slice_begin = cursor;
 
-            while((buffer[cursor] != ' ') | (buffer[cursor] != '\n'))
-            {
+            while(true)
+            {   
+                if(buffer[cursor] == ' ')   break;
+                if(buffer[cursor] == '\n')  break;
+
                 cursor++;
             }
 
             slice_end = cursor;
             memcpy(tempBuffer, &buffer[slice_begin], slice_end - slice_begin);
 
-            ent->vertexArray[vertexIndex].pos[i] = atof(tempBuffer);
+            ent->vertexArray[vertexIndex].pos[posIndex] = (float) atof(tempBuffer);
             memset(tempBuffer, 0, sizeof(tempBuffer));
 
             if(buffer[cursor] == '\n')

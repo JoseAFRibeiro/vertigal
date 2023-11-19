@@ -21,4 +21,6 @@ typedef struct{
     uint32_t numNormals;
 }VG_3D_MODEL_ATTRIBUTES;
 
+VG_3D_ENTITY loadModelFromObj(const char* restrict path);
+
 #endif 
