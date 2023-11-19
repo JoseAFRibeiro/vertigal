@@ -15,7 +15,8 @@ endif
 if sys == 'windows'
         args = [
         '-DDEBUG',
-    ]    
+        '-D_win32',
+    ]      
     cglm_path = get_option('cglm_path')
     glfw_path = get_option('glfw_path')
     glfw_lib = get_option('glfw_lib_option')
