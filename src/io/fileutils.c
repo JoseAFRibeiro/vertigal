@@ -55,12 +55,6 @@ ssize_t VG_getline(char** restrict lineptr, size_t* restrict n, file_buffer_t* r
 
     lnCursor++;
     memcpy(*lineptr, &fb->buffer[fbCursorStart], lnCursor);
-
-    #ifdef DEBUG
-        #ifdef _win32
-        uint32_t size = _msize(*lineptr);
-        #endif
     (*lineptr)[lnCursor] = '\0';
-    #endif
     return lnCursor;
 }
