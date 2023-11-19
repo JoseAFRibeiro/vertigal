@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <malloc.h>
 #include "vertigal/iofuncs.h"
 
 /***
@@ -27,33 +28,39 @@ ssize_t VG_getline(char** restrict lineptr, size_t* restrict n, file_buffer_t* r
     if(fb == NULL)
         return -1;
     
-    ssize_t lnSize = fb->__cursor;
+    ssize_t lnCursor = 0;
+    ssize_t fbCursorStart = fb->__cursor;
 
-    for(lnSize; ;lnSize++)
+    for(lnCursor; ;lnCursor++)
     {
-        if((fb->buffer[lnSize] == '\n') | (fb->buffer[lnSize] == '\0') )
+        if((fb->buffer[fbCursorStart + lnCursor] == '\n') | (fb->buffer[fbCursorStart + lnCursor] == '\0') )
         {
             if(*lineptr == NULL)
             {
-                *lineptr = malloc(lnSize + 1);
+                *lineptr = malloc(lnCursor + 3);
 
                 if(*lineptr == NULL)
                     return -1;
-                fb->__cursor = lnSize+1;
+                fb->__cursor = fbCursorStart + lnCursor + 1;
             }
             
-            if(fb->buffer[lnSize] == '\0')
-                isEOF = true;
+            if(fb->buffer[lnCursor] == '\0')
+                *isEOF = true;
 
             break;
         }
        
     }   
 
-    lnSize++;
-    memcpy(*lineptr, &fb->buffer[fb->__cursor - lnSize ], lnSize);
+    lnCursor++;
+    memcpy(*lineptr, &fb->buffer[fbCursorStart], lnCursor);
 
-    fb->buffer[fb->__cursor] = '\0';
-
-    return lnSize;
+    #ifdef DEBUG
+        #ifdef _win32
+        uint32_t size = _msize(*lineptr);
+        #endif
+    *lineptr[lnCursor] = '\0';
+    vg_log(*lineptr);
+    #endif
+    return lnCursor;
 }
