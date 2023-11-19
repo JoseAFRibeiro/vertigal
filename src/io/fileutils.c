@@ -18,15 +18,8 @@
  * bugs
  ***/
 
-static uint32_t counter = 0;
-
 ssize_t VG_getline(char** restrict lineptr, size_t* restrict n, file_buffer_t* restrict fb, bool* isEOF)
 {
-    counter++;
-    if(counter == 33)
-    {
-        counter--;
-    }
     if(lineptr == NULL)
         return -1;
     
@@ -68,7 +61,6 @@ ssize_t VG_getline(char** restrict lineptr, size_t* restrict n, file_buffer_t* r
         uint32_t size = _msize(*lineptr);
         #endif
     (*lineptr)[lnCursor] = '\0';
-    vg_log(*lineptr);
     #endif
     return lnCursor;
 }
