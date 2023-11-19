@@ -51,7 +51,8 @@ ssize_t VG_getline(char** restrict lineptr, size_t* restrict n, file_buffer_t* r
     }   
 
     lnSize++;
-    memcpy(**lineptr, &fb->buffer[fb->__cursor - lnSize ], &lnSize);
+    memcpy(*lineptr, &fb->buffer[fb->__cursor - lnSize ], lnSize);
+
     fb->buffer[fb->__cursor] = '\0';
 
     return lnSize;
