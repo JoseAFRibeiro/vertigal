@@ -1,4 +1,4 @@
-project('vertigal', 'c')
+project('vertigal', 'c', default_options: ['c_std=17'])
 
 compiler = meson.get_compiler('c')
 sys = build_machine.system()
@@ -39,8 +39,6 @@ src = [
     'src/io/formatedprint.c',
     'src/io/objmodel.c',
     'src/io/fileutils.c'
-
-
 ]
 
 
