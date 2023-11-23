@@ -40,6 +40,8 @@ void renderLoop(GLFWwindow* win)
     glEnableVertexAttribArray(0);
 
     cube = loadModelFromObj("./res/cube.obj");
+
+    //TODO: Deal with models returning NULL pointers
     
     while(!glfwWindowShouldClose(win))
     {   

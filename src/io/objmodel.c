@@ -178,6 +178,8 @@ VG_3D_ENTITY* loadModelFromObj(const char* restrict path)
     fb.__cursor = 0;
     fb.buffer = readFileToBuffer(&lineLen, path);
 
+    if(fb.buffer == NULL) return NULL;
+    
     attrib = firstPassParse(&fb);
     ent = secondPassParse(attrib, &fb);
 

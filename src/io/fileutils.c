@@ -28,6 +28,9 @@ ssize_t VG_getline(char** restrict lineptr, size_t* restrict n, file_buffer_t* r
 
     if(fb == NULL)
         return -1;
+        
+    if(isEOF == NULL)
+        return -1;
     
     ssize_t lnCursor = 0;
     ssize_t fbCursorStart = fb->__cursor;
