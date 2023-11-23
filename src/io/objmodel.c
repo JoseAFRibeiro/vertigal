@@ -163,7 +163,7 @@ VG_3D_MODEL_ATTRIBUTES firstPassParse(file_buffer_t* restrict fb)
     return att;
 }
 
-VG_3D_ENTITY loadModelFromObj(const char* restrict path)
+VG_3D_ENTITY* loadModelFromObj(const char* restrict path)
 {
     char* buffer;
     size_t lineLen;
@@ -171,6 +171,8 @@ VG_3D_ENTITY loadModelFromObj(const char* restrict path)
     VG_3D_ENTITY entity;
     VG_3D_MODEL_ATTRIBUTES attrib;
     VG_3D_ENTITY ent;
+    VG_3D_ENTITY* entptr;
+
     file_buffer_t fb;
 
     fb.__cursor = 0;
@@ -179,5 +181,8 @@ VG_3D_ENTITY loadModelFromObj(const char* restrict path)
     attrib = firstPassParse(&fb);
     ent = secondPassParse(attrib, &fb);
 
-    return ent;
+    entptr = malloc(sizeof(VG_3D_ENTITY));
+    entptr->vertexArray = ent.vertexArray;
+    
+    return entptr;
 }

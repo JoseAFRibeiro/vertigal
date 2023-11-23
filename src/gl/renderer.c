@@ -19,16 +19,34 @@ uint8_t rendererSetup(void)
     return 0;
 }
 
+float vertices[] = {
+    -0.5f, -0.5f, 0.0f,
+     0.5f, -0.5f, 0.0f,
+     0.0f,  0.5f, 0.0f
+}; 
+
 void renderLoop(GLFWwindow* win)
 {
+    VG_3D_ENTITY* cube = {0};
+    uint32_t VBO, VAO, EBO;
 
-    loadModelFromObj("./res/cube.obj");
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    cube = loadModelFromObj("./res/cube.obj");
     
     while(!glfwWindowShouldClose(win))
     {   
         glfwPollEvents();
         glClearColor(0.70f, 0.83f, 0.69f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
         glfwSwapBuffers(win);
     }
 }
