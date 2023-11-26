@@ -63,7 +63,8 @@ void vertexToFloatArray(VG_3D_ENTITY *ent, char* restrict buffer, uint32_t verte
 
             ent->vertexArray[vertexIndex].pos[posIndex] = (float) atof(tempBuffer);
             memset(tempBuffer, 0, sizeof(tempBuffer));
-
+            posIndex++;
+            
             if(buffer[cursor] == '\n')
                 break;
         }
@@ -84,6 +85,7 @@ VG_3D_ENTITY secondPassParse(VG_3D_MODEL_ATTRIBUTES attrib, file_buffer_t* restr
     VG_3D_ENTITY ent;
     
     ent.vertexArray = malloc(sizeof(VG_3D_VERTEX) * attrib.numVertices);
+    memset(ent.vertexArray, 0, sizeof(VG_3D_VERTEX) * attrib.numVertices);
 
     while(vertIndex < attrib.numVertices && !quit)
     {
@@ -116,6 +118,8 @@ VG_3D_ENTITY secondPassParse(VG_3D_MODEL_ATTRIBUTES attrib, file_buffer_t* restr
         free(buffer);
         compBuffer = 0;
     }
+
+    return ent;
 }
 
 
@@ -185,6 +189,7 @@ VG_3D_ENTITY* loadModelFromObj(const char* restrict path)
 
     entptr = malloc(sizeof(VG_3D_ENTITY));
     entptr->vertexArray = ent.vertexArray;
-    
+    entptr->attribs.numVertices = attrib.numVertices;
+
     return entptr;
 }
