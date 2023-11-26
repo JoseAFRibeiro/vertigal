@@ -11,15 +11,17 @@ typedef struct {
     vec2 uv;
 }VG_3D_VERTEX;
 
-typedef struct{
-    VG_3D_VERTEX* vertexArray;
-}VG_3D_ENTITY;
 
 typedef struct{
     uint32_t numVertices;
     uint32_t numFaces;
     uint32_t numNormals;
 }VG_3D_MODEL_ATTRIBUTES;
+
+typedef struct{
+    VG_3D_VERTEX* vertexArray;
+    VG_3D_MODEL_ATTRIBUTES attribs;
+}VG_3D_ENTITY;
 
 VG_3D_ENTITY* loadModelFromObj(const char* restrict path);
 
