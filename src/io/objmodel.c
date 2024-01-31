@@ -187,6 +187,8 @@ VG_3D_ENTITY* loadModelFromObj(const char* restrict path)
     attrib = firstPassParse(&fb);
     ent = secondPassParse(attrib, &fb);
 
+    if(ent.vertexArray == NULL) return NULL;
+
     entptr = malloc(sizeof(VG_3D_ENTITY));
     entptr->vertexArray = ent.vertexArray;
     entptr->attribs.numVertices = attrib.numVertices;
