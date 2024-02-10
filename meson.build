@@ -36,6 +36,7 @@ src = [
     'src/gl/callback.c',
     'src/gl/shaders.c',
     'src/gl/renderer.c',
+    'src/gl/transformations/camera.c',
     'src/io/filemapping.c',
     'src/io/formatedprint.c',
     'src/io/objmodel.c',

@@ -4,6 +4,7 @@
 #include "vertigal/glfuncs.h"
 #include "vertigal/glstrcuts.h"
 #include "vertigal/models.h"
+#include "vertigal/camera.h"
 #include "vertigal/iofuncs.h"
 #include "cglm/mat4.h"
 #include "cglm/cam.h"
@@ -49,17 +50,6 @@ void renderLoop(GLFWwindow* win)
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)5);
     glEnableVertexAttribArray(2);    
-    
-    /*Temporary camera setup*/
-    vec3 cameraPosition  = {0.0f, 0.0f, 3.0f};
-    vec3 cameraTarget  = {0.0f, 0.0f, 0.0f};
-    vec3 cameraDirection = {0.0f};
-    vec3 __cameraUp = {0.0f, 1.0f, 0.0f};
-    vec3 __cameraRight;
-    vec3 __cameraFront = {0.0f, 0.0f, -1.0f};
-    vec3 center = {0.0f, 0.0f, 0.0f};
-    mat4 lookat = {0.0f};
-    /*Temporary camera setup*/
 
     /*Temporary triangle transform*/
     mat4 triangleTransform = GLM_MAT4_IDENTITY_INIT;
@@ -67,7 +57,8 @@ void renderLoop(GLFWwindow* win)
     /*Temporary triangle transform*/
     
     /*Temporary camera transform*/
-    glm_lookat(cameraPosition, center, __cameraUp, lookat);
+    VG_PLAYER_CAMERA cam = cameraSetup();
+
     uint16_t cameraTransformLoc = glGetUniformLocation(shaderProgram, "view");
     /*Temporary camera transform*/
 
@@ -85,7 +76,7 @@ void renderLoop(GLFWwindow* win)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glUniformMatrix4fv(triangleTransformLoc, 1, GL_FALSE, (float *) triangleTransform);
         glUniformMatrix4fv(projectionTransformLoc, 1, GL_FALSE, (float *) projection);
-        glUniformMatrix4fv(cameraTransformLoc, 1, GL_FALSE, (float *) lookat);
+        glUniformMatrix4fv(cameraTransformLoc, 1, GL_FALSE, (float *) cam.lookat);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glfwSwapBuffers(win);
     }
