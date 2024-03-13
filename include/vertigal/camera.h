@@ -5,6 +5,7 @@
 #include "cglm/vec2.h"
 #include "cglm/mat4.h"
 #include "cglm/cam.h"
+#include "GLFW/glfw3.h"
 
 typedef struct{
     vec3 cameraPosition;
@@ -17,5 +18,6 @@ typedef struct{
 }VG_PLAYER_CAMERA;
 
 VG_PLAYER_CAMERA cameraSetup();
+void moveCamera(VG_PLAYER_CAMERA* cam, GLFWwindow* win);
 
 #endif

@@ -1,4 +1,5 @@
 #include "vertigal/camera.h" 
+#include "GLFW/glfw3.h"
 #include <string.h>
 
 VG_PLAYER_CAMERA cameraSetup()
@@ -25,3 +26,24 @@ VG_PLAYER_CAMERA cameraSetup()
     return camera;
 }
 
+void moveCamera(VG_PLAYER_CAMERA* cam, GLFWwindow* win)
+{
+    const float speed = 0.05f;
+    vec3 temp;
+
+    if(glfwGetKey(win, GLFW_KEY_W) == GLFW_PRESS)
+    {   
+        glm_vec3_scale(cam->__cameraFront, speed, temp);
+        glm_vec3_add(cam->cameraPosition, temp, cam->cameraPosition);
+    }    
+
+    if(glfwGetKey(win, GLFW_KEY_S) == GLFW_PRESS)
+    {   
+        glm_vec3_scale(cam->__cameraFront, speed, temp);
+        glm_vec3_sub(cam->cameraPosition, temp, cam->cameraPosition);
+    }
+    
+    glm_vec3_add(cam->cameraPosition, cam->__cameraFront, temp);
+    glm_lookat(cam->cameraPosition, temp , cam->__cameraUp, cam->lookat);
+
+}
