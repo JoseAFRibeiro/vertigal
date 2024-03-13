@@ -39,8 +39,9 @@ src = [
     'src/gl/transformations/camera.c',
     'src/io/filemapping.c',
     'src/io/formatedprint.c',
-    'src/io/objmodel.c',
-    'src/io/fileutils.c'
+    'src/io/fileutils.c',
+    'src/models/objmodel.c',
+    'src/models/objutils.c',
 ]
 
 
