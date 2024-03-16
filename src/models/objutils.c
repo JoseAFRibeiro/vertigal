@@ -52,18 +52,18 @@ uint8_t VG_arrayListAddElement(VG_OBJ_ATTRIB_ARRAY_t* restrict array, VG_OBJ_LIN
     if(array->list == NULL) return 5;
     if(value == NULL) return 4;
     
-    size_t currentArraySizeInElements = array->sizeOfArray / VG_OBJ_LINE_SIZE;
-    if(array->currPosition < currentArraySizeInElements)
+    if(array->currPosition < array->sizeOfArray)
     {
         memcpy(&array->list[array->currPosition], value, sizeof(VG_OBJ_LINE_t));
         array->currPosition++;
-    } else if(array->currPosition >= currentArraySizeInElements) 
+    } else if(array->currPosition >= array->sizeOfArray) 
     {
-        size_t newArraySize = array->sizeOfArray + (VG_OBJ_LINE_SIZE + 4);
-        array->list = realloc(array->list, newArraySize);
+        size_t newArraySize = array->sizeOfArray + 10;
+        array->list = realloc(array->list, newArraySize * VG_OBJ_LINE_SIZE);
 
         if(array->list == NULL ) return 7;
-
+        
+        array->sizeOfArray = newArraySize;
         memcpy(&array->list[array->currPosition], value, sizeof(VG_OBJ_LINE_t));
         array->currPosition++;
     }
