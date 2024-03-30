@@ -53,6 +53,14 @@ uint8_t retrieveModelMetadata(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attr
             default:
             break;
         }
+
+        if(result != 0)
+        {
+            char errorBuffer[100] = {0};
+            sprintf(errorBuffer, "Error: %d", result); 
+            break;
+        }
+        
         *lineStartOffset += lnCursor + 1;
         free(lnBuffer);
         lnBuffer = NULL;
