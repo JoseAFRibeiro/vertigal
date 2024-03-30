@@ -5,7 +5,7 @@
 #include "vertigal/models.h"
 #include "vertigal/iofuncs.h"
 
-uint8_t retrieveModelMetadata(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* restrict attribs)
+uint8_t retrieveModelMetadata(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attribs)
 {
     char* lnBuffer;
     uint16_t lnIdentifier;
@@ -38,21 +38,24 @@ uint8_t retrieveModelMetadata(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* rest
 
         switch (lnIdentifier)
         {
-        case OBJ_VERTEX_ID :
-            lineObj.lineType = GEOMETRIC_VERTEX;
-            break;
-        
-        default:
-            lineObj.lineType = VERTEX_NORMAL;
+            case OBJ_VERTEX_ID :
+                lineObj.lineType = GEOMETRIC_VERTEX;
+                result = VG_arrayListAddElement(&attribs, &lineObj);
+                break;
+            case OBJ_TEX_ID:
+                lineObj.lineType = VERTEX_TEXTURE;
+                result = VG_arrayListAddElement(&attribs, &lineObj);
+                break;            
+            case OBJ_FACE_ID:
+                lineObj.lineType = FACE_INDEX;
+                result = VG_arrayListAddElement(&attribs, &lineObj);
+                break;        
+            default:
             break;
         }
-
-        result = VG_arrayListAddElement(attribs, &lineObj);
         *lineStartOffset += lnCursor + 1;
         free(lnBuffer);
         lnBuffer = NULL;
-
-        counter++;
     } while (!quit);
     
 }

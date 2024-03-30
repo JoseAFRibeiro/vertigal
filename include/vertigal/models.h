@@ -52,7 +52,7 @@ typedef struct{
 
 uint8_t VG_InitLineAttribArray(VG_OBJ_ATTRIB_ARRAY_t* array, size_t initialSize);
 uint8_t VG_arrayListSetElementAtIndex(VG_OBJ_ATTRIB_ARRAY_t* restrict array, size_t index, VG_OBJ_LINE_t* restrict value);
-uint8_t VG_arrayListAddElement(VG_OBJ_ATTRIB_ARRAY_t* restrict array, VG_OBJ_LINE_t* restrict value);
+uint8_t VG_arrayListAddElement(VG_OBJ_ATTRIB_ARRAY_t** restrict array, VG_OBJ_LINE_t* restrict value);
 void VG_arrayListFree(VG_OBJ_ATTRIB_ARRAY_t* array);
 
 
