@@ -5,9 +5,9 @@
 #include <cglm/vec2.h>
 
 #define VG_OBJ_LINE_SIZE sizeof(VG_OBJ_LINE_t)
-#define OBJ_VERTEX_ID 0x7620
-#define OBJ_VERTEX_ID 0x766E
-#define OBJ_VERTEX_ID 0x6620
+#define OBJ_VERTEX_ID 0x2076
+#define OBJ_TEX_ID 0x6E76
+#define OBJ_FACE_ID 0x2066
 
 typedef struct {
     vec3 pos;

@@ -7,38 +7,58 @@
 
 uint8_t retrieveModelMetadata(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* restrict attribs)
 {
-    char* lineBuffer;
-    bool quit = false;
-    ssize_t lineSize;
-    size_t lineLength;
-    size_t offsetTracker;
-    size_t index;
-    VG_ENUM_LINE_TYPE lineType;
-    uint16_t lineIdentifier;
+    char* lnBuffer;
+    uint16_t lnIdentifier;
     uint8_t result;
-    offsetTracker = 0;
+    size_t lnCursor;
+    size_t* lineStartOffset = &buffer->__cursor;
+    bool quit = false;
 
+
+    char temp[100] = {0};
+    int counter = 1;
     do
     {
-        lineSize = VG_getline(&lineBuffer, &lineLength, buffer, &quit);
-        lineIdentifier = (uint16_t *) buffer->buffer[0];
+        lnCursor = 0;
+    
+        do
+        {
+            lnCursor++;
+        } while (!(buffer->buffer[ *lineStartOffset + lnCursor] == '\n' || buffer->buffer[*lineStartOffset + lnCursor] == '\0'));
+        
+        lnBuffer = malloc(sizeof(char) * lnCursor + 1);
+        
+        if(lnBuffer == NULL) return 1;
+        if(buffer->buffer[lnCursor + *lineStartOffset] == '\0') quit = true;
+        
+        memcpy(lnBuffer, &buffer->buffer[*lineStartOffset], lnCursor);
+        memcpy(&lnIdentifier, &buffer->buffer[*lineStartOffset], sizeof(uint16_t));
 
         VG_OBJ_LINE_t lineObj = {
-            .len = lineSize,
-            .offset = offsetTracker
+            .len = lnCursor,
+            .offset = *lineStartOffset
         };
 
-        switch (lineIdentifier)
+        switch (lnIdentifier)
         {
         case OBJ_VERTEX_ID :
             lineObj.lineType = GEOMETRIC_VERTEX;
+            vg_log("Vertex");
             break;
         
         default:
+            lineObj.lineType = VERTEX_NORMAL;
             break;
         }
-        result = VG_arrayListSetElementAtIndex(attribs, index, &lineObj);
-        offsetTracker += lineSize + 1;
+
+        result = VG_arrayListAddElement(attribs, &lineObj);
+        *lineStartOffset += lnCursor + 1;
+        free(lnBuffer);
+        lnBuffer = NULL;
+
+        sprintf(temp, "Still here %d", counter);
+        vg_log(temp);
+        counter++;
     } while (!quit);
     
 }
@@ -63,6 +83,7 @@ VG_3D_ENTITY* loadModelFromObj(const char* restrict path)
     if(fb.buffer == NULL) return NULL;
 
     VG_InitLineAttribArray(&attribArray, 10);
+
     retrieveModelMetadata(&fb, &attribArray);
 
     return entptr;
