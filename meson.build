@@ -7,16 +7,20 @@ if sys == 'linux'
     args = [
         '-DDEBUG'
     ]
+    linker_args = [
+        '-lm'
+    ]
     include = include_directories('include')
     glfw_dep = dependency('glfw3')
     cglm_dep = dependency('cglm')
 endif
 
 if sys == 'windows'
-        args = [
+    args = [
         '-DDEBUG',
         '-D_win32',
     ]      
+    linker_args = []
     cglm_path = get_option('cglm_path')
     glfw_path = get_option('glfw_path')
     glfw_lib = get_option('glfw_lib_option')
@@ -50,4 +54,5 @@ executable(
     src, 
     dependencies: [glfw_dep, cglm_dep], 
     include_directories:[include],
-    c_args: args )
+    c_args: args,
+    link_args: linker_args )
