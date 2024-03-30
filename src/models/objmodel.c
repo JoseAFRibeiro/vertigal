@@ -14,9 +14,6 @@ uint8_t retrieveModelMetadata(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* rest
     size_t* lineStartOffset = &buffer->__cursor;
     bool quit = false;
 
-
-    char temp[100] = {0};
-    int counter = 1;
     do
     {
         lnCursor = 0;
@@ -43,7 +40,6 @@ uint8_t retrieveModelMetadata(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* rest
         {
         case OBJ_VERTEX_ID :
             lineObj.lineType = GEOMETRIC_VERTEX;
-            vg_log("Vertex");
             break;
         
         default:
@@ -56,8 +52,6 @@ uint8_t retrieveModelMetadata(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* rest
         free(lnBuffer);
         lnBuffer = NULL;
 
-        sprintf(temp, "Still here %d", counter);
-        vg_log(temp);
         counter++;
     } while (!quit);
     
