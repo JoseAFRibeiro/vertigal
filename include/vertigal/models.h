@@ -9,12 +9,6 @@
 #define OBJ_TEX_ID 0x6E76
 #define OBJ_FACE_ID 0x2066
 
-typedef struct {
-    vec3 pos;
-    vec3 normal;
-    vec2 uv;
-}VG_3D_VERTEX;
-
 typedef struct{
     uint32_t numVertices;
     uint32_t numFaces;
@@ -22,7 +16,7 @@ typedef struct{
 }VG_3D_MODEL_ATTRIBUTES;
 
 typedef struct{
-    VG_3D_VERTEX* vertexArray;
+    vec3* vertexArray;
     VG_3D_MODEL_ATTRIBUTES attribs;
     int32_t* faceIndices;
 }VG_3D_ENTITY;
@@ -47,6 +41,9 @@ typedef struct{
     size_t currNumElements;
     size_t currSizeElements;
     size_t currPosition;
+    uint32_t numVerts;
+    uint32_t numFaces;
+    uint32_t numTex;
     VG_OBJ_LINE_t* list; 
 }VG_OBJ_ATTRIB_ARRAY_t;
 
@@ -54,8 +51,6 @@ uint8_t VG_InitLineAttribArray(VG_OBJ_ATTRIB_ARRAY_t* array, size_t initialSize)
 uint8_t VG_arrayListSetElementAtIndex(VG_OBJ_ATTRIB_ARRAY_t** restrict array, size_t index, VG_OBJ_LINE_t* restrict value);
 uint8_t VG_arrayListAddElement(VG_OBJ_ATTRIB_ARRAY_t** restrict array, VG_OBJ_LINE_t* restrict value);
 void VG_arrayListFree(VG_OBJ_ATTRIB_ARRAY_t* array);
-
-
 VG_3D_ENTITY* loadModelFromObj(const char* restrict path);
 
 
