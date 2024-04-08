@@ -16,7 +16,7 @@ uint8_t vertexHandeler(file_buffer_t* restrict buffer, uint32_t len, uint32_t of
     uint32_t cursor = offset;
     uint32_t posIndex = 0;
     char tempBuffer[100] = {0};
-    counter++;
+
     while(true)
     {
 
@@ -36,7 +36,7 @@ uint8_t vertexHandeler(file_buffer_t* restrict buffer, uint32_t len, uint32_t of
             }
 
             slice_end = cursor;
-
+            //FIXME: function is missing an exit codition leading to slice looping up to 130 len and causing a segfault
             double temp = (float) strtod(tempBuffer, &tempBuffer[slice_end]);
             (*vector)[posIndex] = temp;
 
@@ -49,6 +49,7 @@ uint8_t vertexHandeler(file_buffer_t* restrict buffer, uint32_t len, uint32_t of
             break;
         
         cursor++;
+        counter++;
     }
     
 }
