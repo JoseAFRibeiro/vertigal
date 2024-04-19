@@ -24,13 +24,30 @@ uint8_t rendererSetup(void)
 }
 
 float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
+    0.0f,  0.0f , 0.0f,
+    0.0f,  0.0f , 0.0f,
+    0.0f,  0.0f , 1.0f,
+    0.0f,  1.0f , 0.0f,
+    0.0f,  1.0f , 1.0f,
+    1.0f,  0.0f , 0.0f,
+    1.0f,  0.0f , 1.0f,
+    1.0f,  1.0f , 0.0f,
+    1.0f,  1.0f , 1.0f
 }; 
 
 unsigned int indices[] = {
-    0, 1, 2, 
+    1, 7,  5,
+    1, 3,  7, 
+    1, 4,  3, 
+    1, 2,  4, 
+    3, 8,  7, 
+    3, 4,  8, 
+    5, 7,  8, 
+    5, 8,  6, 
+    1, 5,  6, 
+    1, 6,  2, 
+    2, 6,  8, 
+    2, 8,  4 
 };
 
 void renderLoop(GLFWwindow* win)
@@ -47,10 +64,14 @@ void renderLoop(GLFWwindow* win)
     
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    
+    for(int i = 0; i< sizeof(indices)/sizeof(int); i++)
+    {
+        indices[i] = indices[i] - 1;
+    }
+    //vg_printArrayVertex((float*)cube->vertexArray, cube->attribs.numVertices);
     //FIXME: memory access violation ao mandar vertices para o GPU    
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(VG_3D_VERTEX) * cube->attribs.numVertices, cube->vertexArray, GL_STATIC_DRAW);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * cube->attribs.numFaces, cube->vertexArray, GL_STATIC_DRAW);
 
     glGenVertexArrays(3, &VAO);
     glBindVertexArray(VAO);
@@ -82,6 +103,7 @@ void renderLoop(GLFWwindow* win)
     while(!glfwWindowShouldClose(win))
     {   
         glfwPollEvents();
+        glEnable(GL_DEPTH_TEST);
         glClearColor(0.70f, 0.83f, 0.69f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
@@ -92,7 +114,7 @@ void renderLoop(GLFWwindow* win)
         glUniformMatrix4fv(projectionTransformLoc, 1, GL_FALSE, (float *) projection);
         glUniformMatrix4fv(cameraTransformLoc, 1, GL_FALSE, (float *) cam.lookat);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         //glDrawArrays(GL_TRIANGLES, 0, 3);
         glfwSwapBuffers(win);
     }
