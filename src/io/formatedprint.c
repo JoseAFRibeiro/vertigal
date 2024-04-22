@@ -22,3 +22,11 @@ void vg_error(char*msg)
     fprintf(stderr, "%s ERROR %s: %s\n", TEXT_RED, TEXT_RESET, msg);
     return;
 }
+
+void vg_printArrayVertex(float* ptr, size_t numElements)
+{
+    for(size_t i = 0; i < numElements * 3; i+=4)
+    {
+        fprintf(stderr, "x: %f | y: %f | z: %f\n", ptr[i], ptr[i+1],ptr[i+2]);
+    }
+}   

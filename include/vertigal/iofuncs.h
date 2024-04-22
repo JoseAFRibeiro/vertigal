@@ -12,6 +12,7 @@ char* readFileToBuffer(size_t* size, const char* path);
 void vg_warn(char* msg);
 void vg_log(char* msg);
 void vg_error(char*msg);
+void vg_printArrayVertex(float* ptr, size_t numElements);
 ssize_t VG_getline(char** restrict lineptr, size_t* restrict lineLength, file_buffer_t* restrict fb, bool* isEOF);
 
 #endif 
