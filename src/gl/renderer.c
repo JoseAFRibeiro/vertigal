@@ -57,17 +57,17 @@ void renderLoop(GLFWwindow* win)
 
     cube = loadModelFromObj("./res/cube.obj");
     glUseProgram(shaderProgram);
-    
+    for(int i = 0; i< sizeof(indices)/sizeof(int); i++)
+    {
+        indices[i] = indices[i] - 1;
+    }
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    for(int i = 0; i< sizeof(indices)/sizeof(int); i++)
-    {
-        indices[i] = indices[i] - 1;
-    }
+
     //vg_printArrayVertex((float*)cube->vertexArray, cube->attribs.numVertices);
     //FIXME: memory access violation ao mandar vertices para o GPU    
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);

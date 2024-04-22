@@ -6,8 +6,32 @@
 #include "vertigal/iofuncs.h"
 
 static int counter = 0;
+int numV;
 
-int32_t vertexFaceHandeler();
+uint8_t vertexFaceHandeler(file_buffer_t* restrict buffer, uint32_t offset, int32_t* restrict vertexFaceIndices)
+{   
+    uint32_t cursor = offset;
+    uint32_t bufferCursor = 0;
+    char tempBuffer[200] = {0};
+    char* bufferLen;
+
+    for(int16_t faceIndexPos = 0; faceIndexPos < 3; faceIndexPos++)
+    {
+        while((buffer->buffer[cursor] <= '0' && buffer->buffer[cursor] >= '9') || buffer->buffer[cursor] != '-')
+        {
+            cursor++;
+        }
+
+        while(buffer->buffer[cursor] != '\n' || buffer->buffer[cursor] != ' ')
+        {
+            tempBuffer[bufferCursor] = buffer->buffer[cursor];
+        }
+        vertexFaceIndices[0] = strtol(tempBuffer, &bufferLen, 10);
+        break;
+    }
+}
+
+//TODO: handle optional W values, use len for optimisations -> use len over endline checks?
 uint8_t vertexHandeler(file_buffer_t* restrict buffer, uint32_t len, uint32_t offset, vec3* vector)
 {
     uint32_t slice_begin;
@@ -15,15 +39,15 @@ uint8_t vertexHandeler(file_buffer_t* restrict buffer, uint32_t len, uint32_t of
     uint32_t bufferCursor;
     uint32_t cursor = offset;
     uint32_t posIndex = 0;
-    char tempBuffer[100] = {0};
+    char tempBuffer[200] = {0};
 
     while(true)
     {
-
         if((buffer->buffer[cursor] >= '0') && (buffer->buffer[cursor] <= '9'))
         {
             slice_begin = cursor;
             bufferCursor = 0;
+            slice_end = 0;
 
             while(true)
             {   
@@ -35,8 +59,7 @@ uint8_t vertexHandeler(file_buffer_t* restrict buffer, uint32_t len, uint32_t of
                 bufferCursor++;
             }
 
-            slice_end = cursor;
-            //FIXME: function is missing an exit codition leading to slice looping up to 130 len and causing a segfault
+            slice_end = cursor - slice_begin;
             double temp = (float) strtod(tempBuffer, &tempBuffer[slice_end]);
             (*vector)[posIndex] = temp;
 
@@ -49,9 +72,9 @@ uint8_t vertexHandeler(file_buffer_t* restrict buffer, uint32_t len, uint32_t of
             break;
         
         cursor++;
-        counter++;
     }
     
+    return 1;
 }
 
 uint8_t retrieveModelMetadata(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attribs)
@@ -129,7 +152,7 @@ uint8_t objToVG3DEntity(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attribs, V
     ent->attribs.numFaces = attribs->numFaces;
     ent->vertexArray = malloc(attribs->numVerts * sizeof(vec3));
     ent->faceIndices = malloc(attribs->numFaces * sizeof(uint32_t));
-
+    
     if((ent->vertexArray == NULL) || (ent->faceIndices == NULL))
         return 1;
 
@@ -137,14 +160,18 @@ uint8_t objToVG3DEntity(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attribs, V
     {
         uint32_t lineLen = attribs->list[i].len;
         uint32_t lineOffset = attribs->list[i]. offset;
-        vec3 test = {0};
+        vec3 tempVec = {0};
         switch(attribs->list[i].lineType)
         {
             case GEOMETRIC_VERTEX:
-                vertexHandeler(buffer, lineLen, lineOffset, &test);
-                //ent->vertexArray[currentVertexIndex]; 
+                vertexHandeler(buffer, lineLen, lineOffset, &tempVec);
+                ent->vertexArray[currentVertexIndex][0] = tempVec[0]; 
+                ent->vertexArray[currentVertexIndex][1] = tempVec[1]; 
+                ent->vertexArray[currentVertexIndex][2] = tempVec[2];
+                currentVertexIndex += 1; 
+                break;
             case FACE_INDEX:
-                //ent->faceIndices[currentFaceIndex] = vertexFaceHandeler();
+                vertexFaceHandeler(buffer, lineOffset, ent->faceIndices);
                 break;
         }
     }
@@ -171,6 +198,8 @@ VG_3D_ENTITY* loadModelFromObj(const char* restrict path)
     if(result != 0) return NULL;
 
     entptr = malloc(sizeof(VG_3D_ENTITY));
+    entptr->vertexArray = malloc(sizeof(float) * attribArray.numVerts);
+    entptr->faceIndices = malloc(sizeof(int32_t) * attribArray.numFaces);
     objToVG3DEntity(&fb, &attribArray, entptr);
 
     return entptr;
