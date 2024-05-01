@@ -63,7 +63,7 @@ void renderLoop(GLFWwindow* win)
     }
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, cube->attribs.numFaces * sizeof(uint32_t), cube->faceIndices, GL_STATIC_DRAW);
     
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);

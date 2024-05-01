@@ -30,6 +30,13 @@ typedef enum {
     LINE_ELEMENT
 }VG_ENUM_LINE_TYPE;
 
+typedef enum{
+    VERTEX_ONLY,
+    VT_INDEX,
+    VTN_INDEX,
+    VN_INDEX
+}VG_OBJ_FACE_TYPE;
+
 typedef struct {
     VG_ENUM_LINE_TYPE lineType;
     uint32_t len;

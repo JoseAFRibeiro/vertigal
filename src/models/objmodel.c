@@ -5,49 +5,93 @@
 #include "vertigal/models.h"
 #include "vertigal/iofuncs.h"
 
-static int counter = 0;
 int numV;
 
-uint8_t vertexFaceHandeler(file_buffer_t* restrict buffer, uint32_t offset, int32_t* restrict vertexFaceIndices)
+uint8_t vertexFaceHandeler(file_buffer_t* restrict buffer, size_t lineLen,uint32_t offset, 
+                            int32_t* restrict vertexFaceIndices, uint32_t* restrict faceIndex)
 {   
-    uint32_t cursor = offset;
+    //+3 to jump the first character + 2 follwing spaces
+    uint32_t cursor = offset + 3;
     uint32_t bufferCursor = 0;
     char tempBuffer[200] = {0};
     char* bufferLen;
 
-    for(int16_t faceIndexPos = 0; faceIndexPos < 3; faceIndexPos++)
+    /*for(int16_t faceIndexPos = 0; faceIndexPos < 3; faceIndexPos++)
     {
-        while((buffer->buffer[cursor] <= '0' && buffer->buffer[cursor] >= '9') || buffer->buffer[cursor] != '-')
+        while((buffer->buffer[cursor] <= '0' || buffer->buffer[cursor] >= '9') && buffer->buffer[cursor] != '-')
         {
             cursor++;
         }
 
-        while(buffer->buffer[cursor] != '\n' || buffer->buffer[cursor] != ' ')
+        uint8_t bufferSelector = 0;
+        
+        while(buffer->buffer[cursor] != ' ')
         {
-            tempBuffer[bufferCursor] = buffer->buffer[cursor];
+            bufferSelector++;
+            while((buffer->buffer[cursor] != '\n') && (buffer->buffer[cursor] != ' ') && (buffer->buffer[cursor] != '/'))
+            {
+                tempBuffer[bufferCursor] = buffer->buffer[cursor];
+                bufferCursor++;
+                cursor++;
+            }
+            if(bufferSelector == 1)
+                vertexFaceIndices[*faceIndex] = strtol(tempBuffer, &bufferLen, 10);
+            
+            cursor++;
+            (*faceIndex)++;
         }
-        vertexFaceIndices[0] = strtol(tempBuffer, &bufferLen, 10);
-        break;
+        
+        bufferSelector = 0;
+    }*/
+
+    while((cursor - offset) <= lineLen)
+    {
+        while((buffer->buffer[cursor] >= '0' && buffer->buffer[cursor] <= '9') && buffer->buffer[cursor] != '-')
+        {     
+            tempBuffer[bufferCursor] = buffer->buffer[cursor];
+            bufferCursor++;
+            cursor++; 
+        }
+
+        switch (buffer->buffer[cursor+1])
+        {
+        case ' ':
+            vertexFaceIndices[*faceIndex] = strtol(tempBuffer, &bufferLen, 10) - 1;
+            vg_log(tempBuffer);
+            memset(tempBuffer, 0, 200);
+            bufferCursor = 0;
+            (*faceIndex)++;
+            cursor++;
+            break;
+        case '/':
+            while(buffer->buffer[cursor] != ' '){cursor++;}
+            break;
+        default:
+            cursor++;
+            break;
+        } 
     }
+
+    vertexFaceIndices[*faceIndex] = strtol(tempBuffer, &bufferLen, 10) - 1;
+    (*faceIndex)++;
+
+    return 0; 
 }
 
 //TODO: handle optional W values, use len for optimisations -> use len over endline checks?
 uint8_t vertexHandeler(file_buffer_t* restrict buffer, uint32_t len, uint32_t offset, vec3* vector)
 {
-    uint32_t slice_begin;
-    uint32_t slice_end;
     uint32_t bufferCursor;
     uint32_t cursor = offset;
     uint32_t posIndex = 0;
     char tempBuffer[200] = {0};
-
+    char *bufferLen;
     while(true)
     {
         if((buffer->buffer[cursor] >= '0') && (buffer->buffer[cursor] <= '9'))
         {
             slice_begin = cursor;
             bufferCursor = 0;
-            slice_end = 0;
 
             while(true)
             {   
@@ -59,8 +103,7 @@ uint8_t vertexHandeler(file_buffer_t* restrict buffer, uint32_t len, uint32_t of
                 bufferCursor++;
             }
 
-            slice_end = cursor - slice_begin;
-            double temp = (float) strtod(tempBuffer, &tempBuffer[slice_end]);
+            double temp = (float) strtod(tempBuffer, &bufferLen);
             (*vector)[posIndex] = temp;
 
             memset(tempBuffer, 0, sizeof(tempBuffer));
@@ -147,7 +190,7 @@ uint8_t retrieveModelMetadata(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attr
 uint8_t objToVG3DEntity(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attribs, VG_3D_ENTITY *ent)
 {
     uint32_t currentVertexIndex = 0;
-    uint32_t currentFaceIndex = 0;
+    uint32_t faceIndex = 0;
     ent->attribs.numVertices = attribs->numVerts;
     ent->attribs.numFaces = attribs->numFaces;
     ent->vertexArray = malloc(attribs->numVerts * sizeof(vec3));
@@ -171,11 +214,15 @@ uint8_t objToVG3DEntity(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attribs, V
                 currentVertexIndex += 1; 
                 break;
             case FACE_INDEX:
-                vertexFaceHandeler(buffer, lineOffset, ent->faceIndices);
+                vertexFaceHandeler(buffer, attribs->list[i].len,lineOffset, ent->faceIndices, &faceIndex);
+                break;
+            default:
                 break;
         }
     }
-}
+
+    return 0;
+}   
 
 VG_3D_ENTITY* loadModelFromObj(const char* restrict path)
 {
