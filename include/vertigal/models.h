@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <cglm/vec3.h>
 #include <cglm/vec2.h>
+#include <cglm/ivec3.h>
 
 #define VG_OBJ_LINE_SIZE sizeof(VG_OBJ_LINE_t)
 #define OBJ_VERTEX_ID 0x2076
@@ -17,8 +18,8 @@ typedef struct{
 
 typedef struct{
     vec3* vertexArray;
-    VG_3D_MODEL_ATTRIBUTES attribs;
     int32_t* faceIndices;
+    VG_3D_MODEL_ATTRIBUTES attribs;
 }VG_3D_ENTITY;
 
 typedef enum {

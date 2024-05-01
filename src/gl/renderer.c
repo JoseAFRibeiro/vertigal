@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
+#include <malloc.h>
 #include "vertigal/glfuncs.h"
 #include "vertigal/glstrcuts.h"
 #include "vertigal/models.h"
@@ -57,13 +58,10 @@ void renderLoop(GLFWwindow* win)
 
     cube = loadModelFromObj("./res/cube.obj");
     glUseProgram(shaderProgram);
-    for(int i = 0; i< sizeof(indices)/sizeof(int); i++)
-    {
-        indices[i] = indices[i] - 1;
-    }
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, cube->attribs.numFaces * sizeof(uint32_t), cube->faceIndices, GL_STATIC_DRAW);
+    size_t result = sizeof(indices);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
