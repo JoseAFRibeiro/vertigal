@@ -7,7 +7,7 @@
 #include "vertigal/models.h"
 #include "vertigal/iofuncs.h"
 
-int numV;
+int numV = 0;
 
 uint8_t vertexFaceHandeler(file_buffer_t* restrict buffer, size_t lineLen,uint32_t offset, 
                             int32_t* vertexFaceIndices)
@@ -60,13 +60,14 @@ uint8_t vertexFaceHandeler(file_buffer_t* restrict buffer, size_t lineLen,uint32
         {
         case ' ':
             
-            snprintf(tempp, 300, "Added value %ld at position %d", strtol(tempBuffer, &bufferLen, 10) - 1, faceIndex);
+            snprintf(tempp, 300, "Added value %ld at position %d", strtol(tempBuffer, &bufferLen, 10) - 1, numV);
             vg_log(tempp);
             vertexFaceIndices[faceIndex] = strtol(tempBuffer, &bufferLen, 10) - 1;
             memset(tempBuffer, 0, 200);
             bufferCursor = 0;
             faceIndex++;
             cursor++;
+            numV++;
             break;
         case '/':
             while(buffer->buffer[cursor] != ' '){cursor++;}
@@ -78,10 +79,10 @@ uint8_t vertexFaceHandeler(file_buffer_t* restrict buffer, size_t lineLen,uint32
     }
 
     vertexFaceIndices[faceIndex] = strtol(tempBuffer, &bufferLen, 10) - 1;
-    snprintf(tempp, 300, "Added value %ld at position %d", strtol(tempBuffer, &bufferLen, 10) - 1, faceIndex); 
+    snprintf(tempp, 300, "Added value %ld at position %d", strtol(tempBuffer, &bufferLen, 10) - 1, numV); 
     vg_log(tempp);
     faceIndex++;
-
+    numV++;
     return 0; 
 }
 
@@ -231,7 +232,12 @@ uint8_t objToVG3DEntity(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attribs, V
                 break;
         }
     }
-
+    for(int i = 0; i < ent->attribs.numFaces * 3; i++)
+    {
+        char tempp[300]  = {0};
+        snprintf(tempp, 300, "Added value %d at position %d", ent->faceIndices[i], i); 
+        vg_log(tempp);
+    }
     return 0;
 }   
 
@@ -239,10 +245,9 @@ VG_3D_ENTITY* loadModelFromObj(const char* restrict path)
 {
     size_t bufferLen;
     uint8_t result;
-    VG_OBJ_ATTRIB_ARRAY_t attribArray;
     VG_3D_ENTITY* entptr;
-
     file_buffer_t fb;
+    VG_OBJ_ATTRIB_ARRAY_t attribArray = {0};
 
     fb.__cursor = 0;
     fb.buffer = readFileToBuffer(&bufferLen, path);
