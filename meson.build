@@ -16,11 +16,18 @@ if sys == 'linux'
 endif
 
 if sys == 'windows'
+    if compiler.get_id() == 'gcc'
     args = [
         '-DDEBUG',
         '-D_win32',
     ]      
-    linker_args = []
+    elif compiler.get_id() == 'msvc'
+        args = [
+            '/DDEBUG',
+            '/D_win32',
+        ]      
+    endif
+    linker_args = ['/MACHINE:x64']
     cglm_path = get_option('cglm_path')
     glfw_path = get_option('glfw_path')
     glfw_lib = get_option('glfw_lib_option')

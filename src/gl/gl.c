@@ -41,7 +41,7 @@ GLFWwindow* glInit(void)
     #ifdef DEBUG
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-    glDebugMessageCallback(DebugCallback, NULL);
+    glDebugMessageCallback((GLDEBUGPROC)DebugCallback, NULL);
     #endif
 
     glViewport(0, 0, 1920, 1080);
