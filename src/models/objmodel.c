@@ -10,7 +10,7 @@
 int numV = 0;
 
 uint8_t vertexFaceHandeler(file_buffer_t* restrict buffer, size_t lineLen,uint32_t offset, 
-                            int32_t* vertexFaceIndices, uint32_t* restrict vertexFaceIndex)
+                            int32_t* vertexFaceIndices)
 {   
     //+3 to jump the first character + 2 follwing spaces
     uint32_t cursor = offset + 3;
@@ -31,9 +31,9 @@ uint8_t vertexFaceHandeler(file_buffer_t* restrict buffer, size_t lineLen,uint32
             cursor++; 
         }
         
-        vertexFaceIndices[*vertexFaceIndex] = strtol(tempBuffer1, &bufferLen, 10);
+        vertexFaceIndices[faceIndex] = strtol(tempBuffer1, &bufferLen, 10);
         memset(tempBuffer1, 0, sizeof(tempBuffer1));
-        (*vertexFaceIndex)++;
+        faceIndex++;
         cursor++;
         bufferCursor = 0;
 
@@ -174,7 +174,7 @@ uint8_t objToVG3DEntity(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attribs, V
     ent->attribs.numVertices = attribs->numVerts;
     ent->attribs.numFaces = attribs->numFaces;
     ent->vertexArray = malloc(attribs->numVerts * sizeof(vec3));
-    ent->faceIndices = malloc(attribs->numFaces * sizeof(int32_t));
+    ent->faceIndices = malloc((attribs->numFaces * sizeof(int32_t)) * 3);
     
     if((ent->vertexArray == NULL) || (ent->faceIndices == NULL))
         return 1;
@@ -195,7 +195,7 @@ uint8_t objToVG3DEntity(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attribs, V
                 break;
             case FACE_INDEX:
                 int32_t arr[3] = {0};
-                vertexFaceHandeler(buffer, attribs->list[i].len,lineOffset, arr, &currentVertexIndex);
+                vertexFaceHandeler(buffer, attribs->list[i].len,lineOffset, arr);
                 ent->faceIndices[faceIndex] = arr[0];
                 ent->faceIndices[faceIndex+1] = arr[1];
                 ent->faceIndices[faceIndex+2] = arr[2];
