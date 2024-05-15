@@ -10,73 +10,53 @@
 int numV = 0;
 
 uint8_t vertexFaceHandeler(file_buffer_t* restrict buffer, size_t lineLen,uint32_t offset, 
-                            int32_t* vertexFaceIndices)
+                            int32_t* vertexFaceIndices, uint32_t* restrict vertexFaceIndex)
 {   
     //+3 to jump the first character + 2 follwing spaces
     uint32_t cursor = offset + 3;
     uint32_t bufferCursor = 0;
-    char tempBuffer[200] = {0};
+    char tempBuffer1[200] = {0};
+    char tempBuffer2[200] = {0};
+    char tempBuffer3[200] = {0};
     char* bufferLen;
-    char tempp[300] = {0};
     int32_t faceIndex = 0;
-    /*for(int16_t faceIndexPos = 0; faceIndexPos < 3; faceIndexPos++)
-    {
-        while((buffer->buffer[cursor] <= '0' || buffer->buffer[cursor] >= '9') && buffer->buffer[cursor] != '-')
-        {
-            cursor++;
-        }
 
-        uint8_t bufferSelector = 0;
-        
-        while(buffer->buffer[cursor] != ' ')
-        {
-            bufferSelector++;
-            while((buffer->buffer[cursor] != '\n') && (buffer->buffer[cursor] != ' ') && (buffer->buffer[cursor] != '/'))
-            {
-                tempBuffer[bufferCursor] = buffer->buffer[cursor];
-                bufferCursor++;
-                cursor++;
-            }
-            if(bufferSelector == 1)
-                vertexFaceIndices[*faceIndex] = strtol(tempBuffer, &bufferLen, 10);
-            
-            cursor++;
-            (*faceIndex)++;
-        }
-        
-        bufferSelector = 0;
-    }*/
-    
     while((cursor - offset) <= lineLen)
     {
+        //loop first 
         while((buffer->buffer[cursor] >= '0' && buffer->buffer[cursor] <= '9') && buffer->buffer[cursor] != '-')
         {     
-            tempBuffer[bufferCursor] = buffer->buffer[cursor];
+            tempBuffer1[bufferCursor] = buffer->buffer[cursor];
+            bufferCursor++;
+            cursor++; 
+        }
+        
+        vertexFaceIndices[*vertexFaceIndex] = strtol(tempBuffer1, &bufferLen, 10);
+        memset(tempBuffer1, 0, sizeof(tempBuffer1));
+        (*vertexFaceIndex)++;
+        cursor++;
+        bufferCursor = 0;
+
+        while((buffer->buffer[cursor] >= '0' && buffer->buffer[cursor] <= '9') && buffer->buffer[cursor] != '-')
+        {     
+            tempBuffer2[bufferCursor] = buffer->buffer[cursor];
             bufferCursor++;
             cursor++; 
         }
 
-        switch (buffer->buffer[cursor+1])
-        {
-        case ' ':
-            vertexFaceIndices[faceIndex] = strtol(tempBuffer, &bufferLen, 10);
-            memset(tempBuffer, 0, 200);
-            bufferCursor = 0;
-            faceIndex++;
-            cursor++;
-            break;
-        case '/':
-            while(buffer->buffer[cursor] != ' '){cursor++;}
-            break;
-        default:
-            cursor++;
-            break;
-        } 
+        cursor++;
+
+        while((buffer->buffer[cursor] >= '0' && buffer->buffer[cursor] <= '9') && buffer->buffer[cursor] != '-')
+        {     
+            tempBuffer3[bufferCursor] = buffer->buffer[cursor];
+            bufferCursor++;
+            cursor++; 
+        }
+
+        cursor += 2;
+
     }
 
-    vertexFaceIndices[faceIndex] = strtol(tempBuffer, &bufferLen, 10);
-    faceIndex++;
-    return 0; 
 }
 
 //TODO: handle optional W values, use len for optimisations -> use len over endline checks?
@@ -194,7 +174,7 @@ uint8_t objToVG3DEntity(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attribs, V
     ent->attribs.numVertices = attribs->numVerts;
     ent->attribs.numFaces = attribs->numFaces;
     ent->vertexArray = malloc(attribs->numVerts * sizeof(vec3));
-    ent->faceIndices = malloc(attribs->numFaces * sizeof(ivec3));
+    ent->faceIndices = malloc(attribs->numFaces * sizeof(int32_t));
     
     if((ent->vertexArray == NULL) || (ent->faceIndices == NULL))
         return 1;
@@ -215,7 +195,7 @@ uint8_t objToVG3DEntity(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attribs, V
                 break;
             case FACE_INDEX:
                 int32_t arr[3] = {0};
-                vertexFaceHandeler(buffer, attribs->list[i].len,lineOffset, arr);
+                vertexFaceHandeler(buffer, attribs->list[i].len,lineOffset, arr, &currentVertexIndex);
                 ent->faceIndices[faceIndex] = arr[0];
                 ent->faceIndices[faceIndex+1] = arr[1];
                 ent->faceIndices[faceIndex+2] = arr[2];

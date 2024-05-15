@@ -56,6 +56,8 @@ void renderLoop(GLFWwindow* win)
     uint32_t VBO, VAO, EBO;
 
     cube = loadModelFromObj("./res/cube.obj");
+
+    if(cube == NULL) return;
     glUseProgram(shaderProgram);
 
     glGenBuffers(1, &EBO);
@@ -101,6 +103,7 @@ void renderLoop(GLFWwindow* win)
 
     glfwSwapInterval(1);
     glBindVertexArray(VAO);
+
     while(!glfwWindowShouldClose(win))
     {   
         glfwPollEvents();
@@ -116,7 +119,7 @@ void renderLoop(GLFWwindow* win)
         glUniformMatrix4fv(cameraTransformLoc, 1, GL_FALSE, (float *) cam.lookat);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glDrawElements(GL_TRIANGLES, cube->attribs.numFaces * 3, GL_UNSIGNED_INT, 0);
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
+
         glfwSwapBuffers(win);
     }
 }
