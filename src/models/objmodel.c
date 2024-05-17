@@ -21,6 +21,8 @@ uint8_t vertexFaceHandeler(file_buffer_t* restrict buffer, size_t lineLen,uint32
     char* bufferLen;
     int32_t faceIndex = 0;
 
+    char* tempPtr = buffer->buffer;
+    
     while((cursor - offset) <= lineLen)
     {
         //loop first 
@@ -45,7 +47,7 @@ uint8_t vertexFaceHandeler(file_buffer_t* restrict buffer, size_t lineLen,uint32
         }
 
         cursor++;
-
+        bufferCursor = 0;
         while((buffer->buffer[cursor] >= '0' && buffer->buffer[cursor] <= '9') && buffer->buffer[cursor] != '-')
         {     
             tempBuffer3[bufferCursor] = buffer->buffer[cursor];
@@ -54,7 +56,7 @@ uint8_t vertexFaceHandeler(file_buffer_t* restrict buffer, size_t lineLen,uint32
         }
 
         cursor += 2;
-
+        bufferCursor = 0;
     }
 
 }
@@ -181,6 +183,7 @@ uint8_t objToVG3DEntity(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attribs, V
 
     for(uint32_t i = 0; i < attribs->currPosition; i++)
     {
+        printf("%d\n", i);
         uint32_t lineLen = attribs->list[i].len;
         uint32_t lineOffset = attribs->list[i]. offset;
         vec3 tempVec = {0};
