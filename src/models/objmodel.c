@@ -22,7 +22,6 @@ uint8_t vertexFaceHandeler(file_buffer_t* restrict buffer, size_t lineLen,uint32
     int32_t faceIndex = 0;
     
     char* tempPtr = buffer->buffer;
-    printf("%d\n", numV);
     
     while(lineLen > (cursor - offset))
     {

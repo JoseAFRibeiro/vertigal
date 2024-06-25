@@ -62,17 +62,12 @@ void renderLoop(GLFWwindow* win)
 
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, cube->attribs.numFaces * sizeof(uint32_t) * 3, cube->faceIndices, GL_STATIC_DRAW);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    
-    //uint32_t *debug_ptr = malloc(cube->attribs.numFaces * sizeof(uint32_t) * 3); 
-    uint32_t *buffer_pttr = (uint32_t *) glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, cube->attribs.numFaces * sizeof(uint32_t) * 3, GL_MAP_READ_BIT);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, cube->attribs.numFaces * sizeof(uint32_t) * 3, cube->faceIndices, GL_STATIC_DRAW);
+    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-    //vg_printArrayVertex((float*)cube->vertexArray, cube->attribs.numVertices);
-    //FIXME: memory access violation ao mandar vertices para o GPU    
     //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * cube->attribs.numVertices, cube->vertexArray, GL_STATIC_DRAW);
 
