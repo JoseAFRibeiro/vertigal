@@ -20,6 +20,7 @@ if sys == 'windows'
         args = [
             '-DDEBUG',
             '-D_win32',
+            '-fstack-protector-all'
         ]      
         linker_args = []
     elif compiler.get_id() == 'msvc'
@@ -30,6 +31,7 @@ if sys == 'windows'
         ]     
         linker_args = ['/MACHINE:x64']
     endif
+endif
     cglm_path = get_option('cglm_path')
     glfw_path = get_option('glfw_path')
     glfw_lib = get_option('glfw_lib_option')
@@ -38,9 +40,8 @@ if sys == 'windows'
     include += glfw_path / 'include'
     include += cglm_path / 'include'
 
-    glfw_dep = compiler.find_library('glfw3', dirs: glfw_path / glfw_lib)
+    glfw_dep = compiler.find_library('glfw3', dirs: glfw_path / glfw_lib, static: true)
     cglm_dep = compiler.find_library('cglm', dirs: cglm_path / 'build')
-endif
 
 src = [
     'src/main.c',

@@ -62,8 +62,8 @@ void renderLoop(GLFWwindow* win)
 
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, cube->attribs.numFaces * sizeof(uint32_t) * 3, cube->faceIndices, GL_STATIC_DRAW);
-    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, cube->attribs.numFaces * sizeof(uint32_t) * 3, cube->faceIndices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     
     //uint32_t *debug_ptr = malloc(cube->attribs.numFaces * sizeof(uint32_t) * 3); 
     uint32_t *buffer_pttr = (uint32_t *) glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, cube->attribs.numFaces * sizeof(uint32_t) * 3, GL_MAP_READ_BIT);
@@ -73,32 +73,28 @@ void renderLoop(GLFWwindow* win)
 
     //vg_printArrayVertex((float*)cube->vertexArray, cube->attribs.numVertices);
     //FIXME: memory access violation ao mandar vertices para o GPU    
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * cube->attribs.numVertices, cube->vertexArray, GL_STATIC_DRAW);
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * cube->attribs.numVertices, cube->vertexArray, GL_STATIC_DRAW);
 
-    glGenVertexArrays(3, &VAO);
+    glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)3);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)5);
-    glEnableVertexAttribArray(2);    
 
     /*Temporary triangle transform*/
     mat4 triangleTransform = GLM_MAT4_IDENTITY_INIT;
-    uint16_t triangleTransformLoc = glGetUniformLocation(shaderProgram, "model");
+    GLint triangleTransformLoc = glGetUniformLocation(shaderProgram, "model");
     /*Temporary triangle transform*/
     
     /*Temporary camera transform*/
     VG_PLAYER_CAMERA cam = cameraSetup();
-    uint16_t cameraTransformLoc = glGetUniformLocation(shaderProgram, "view");
+    GLint cameraTransformLoc = glGetUniformLocation(shaderProgram, "view");
     /*Temporary camera transform*/
 
     /*Temporary projection transform*/
     mat4 projection = GLM_MAT4_IDENTITY_INIT;
     glm_perspective(glm_rad(45), 16/9, 0.1f, 100.0f, projection);
-    uint16_t projectionTransformLoc = glGetUniformLocation(shaderProgram, "projection");
+    GLint projectionTransformLoc = glGetUniformLocation(shaderProgram, "projection");
     /*Temporary projection transform*/
 
     glfwSwapInterval(1);
