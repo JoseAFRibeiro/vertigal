@@ -7,16 +7,31 @@ if sys == 'linux'
     args = [
         '-DDEBUG'
     ]
+    linker_args = [
+        '-lm'
+    ]
     include = include_directories('include')
     glfw_dep = dependency('glfw3')
     cglm_dep = dependency('cglm')
 endif
 
 if sys == 'windows'
+    if compiler.get_id() == 'gcc'
         args = [
-        '-DDEBUG',
-        '-D_win32',
-    ]      
+            '-DDEBUG',
+            '-D_win32',
+            '-fstack-protector-all'
+        ]      
+        linker_args = []
+    elif compiler.get_id() == 'msvc'
+        args = [
+            '/DDEBUG',
+            '/D_win32',
+            '/VERBOSE:LIB',
+        ]     
+        linker_args = ['/MACHINE:x64']
+    endif
+endif
     cglm_path = get_option('cglm_path')
     glfw_path = get_option('glfw_path')
     glfw_lib = get_option('glfw_lib_option')
@@ -25,9 +40,8 @@ if sys == 'windows'
     include += glfw_path / 'include'
     include += cglm_path / 'include'
 
-    glfw_dep = compiler.find_library('glfw3', dirs: glfw_path / glfw_lib)
+    glfw_dep = compiler.find_library('glfw3', dirs: glfw_path / glfw_lib, static: true)
     cglm_dep = compiler.find_library('cglm', dirs: cglm_path / 'build')
-endif
 
 src = [
     'src/main.c',
@@ -36,10 +50,12 @@ src = [
     'src/gl/callback.c',
     'src/gl/shaders.c',
     'src/gl/renderer.c',
+    'src/gl/transformations/camera.c',
     'src/io/filemapping.c',
     'src/io/formatedprint.c',
-    'src/io/objmodel.c',
-    'src/io/fileutils.c'
+    'src/io/fileutils.c',
+    'src/models/objmodel.c',
+    'src/models/objutils.c',
 ]
 
 
@@ -48,4 +64,5 @@ executable(
     src, 
     dependencies: [glfw_dep, cglm_dep], 
     include_directories:[include],
-    c_args: args )
+    c_args: args,
+    link_args: linker_args )

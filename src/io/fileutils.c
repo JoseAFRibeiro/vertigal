@@ -18,12 +18,12 @@
  * bugs
  ***/
 
-ssize_t VG_getline(char** restrict lineptr, size_t* restrict n, file_buffer_t* restrict fb, bool* isEOF)
+ssize_t VG_getline(char** restrict lineptr, size_t* restrict lineLenght, file_buffer_t* restrict fb, bool* isEOF)
 {
     if(lineptr == NULL)
         return -1;
     
-    if(n == NULL )
+    if(lineLenght == NULL )
         return -1;
 
     if(fb == NULL)

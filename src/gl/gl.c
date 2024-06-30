@@ -19,6 +19,7 @@ GLFWwindow* glInit(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE); 
 
     win = glfwCreateWindow(1920, 1080, "Vertigal", NULL, NULL);
 
@@ -41,7 +42,7 @@ GLFWwindow* glInit(void)
     #ifdef DEBUG
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-    glDebugMessageCallback(DebugCallback, NULL);
+    glDebugMessageCallback((GLDEBUGPROC)DebugCallback, NULL);
     #endif
 
     glViewport(0, 0, 1920, 1080);

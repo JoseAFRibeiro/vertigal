@@ -2,7 +2,6 @@
 #include "vertigal/iofuncs.h"
 #include "vertigal/glstrcuts.h"
 #include <GLFW/glfw3.h>
-#include <unistd.h>
 
 #define INFO_LOG_SIZE 2048
 
