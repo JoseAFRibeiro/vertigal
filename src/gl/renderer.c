@@ -24,15 +24,14 @@ uint8_t rendererSetup(void)
 }
 
 float vertices[] = {
-    0.0f,  0.0f , 0.0f,
-    0.0f,  0.0f , 0.0f,
-    0.0f,  0.0f , 1.0f,
-    0.0f,  1.0f , 0.0f,
-    0.0f,  1.0f , 1.0f,
-    1.0f,  0.0f , 0.0f,
-    1.0f,  0.0f , 1.0f,
-    1.0f,  1.0f , 0.0f,
-    1.0f,  1.0f , 1.0f
+    0.0f,  0.0f,  0.0f,
+    0.0f,  0.0f,  1.0f,
+    0.0f,  1.0f,  0.0f,
+    0.0f,  1.0f,  1.0f,
+    1.0f,  0.0f,  0.0f,
+    1.0f,  0.0f,  1.0f,
+    1.0f,  1.0f,  0.0f,
+    1.0f,  1.0f,  1.0f
 }; 
 
 unsigned int indices[] = {
@@ -109,7 +108,7 @@ void renderLoop(GLFWwindow* win)
         glUniformMatrix4fv(projectionTransformLoc, 1, GL_FALSE, (float *) projection);
         glUniformMatrix4fv(cameraTransformLoc, 1, GL_FALSE, (float *) cam.lookat);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glDrawElements(GL_TRIANGLES, cube->attribs.numFaces * 3, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(win);
     }

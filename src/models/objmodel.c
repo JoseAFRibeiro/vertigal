@@ -198,9 +198,9 @@ uint8_t objToVG3DEntity(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attribs, V
             case FACE_INDEX:
                 int32_t arr[3] = {0};
                 vertexFaceHandeler(buffer, attribs->list[i].len,lineOffset, arr);
-                ent->faceIndices[faceIndex] = arr[0];
-                ent->faceIndices[faceIndex+1] = arr[1];
-                ent->faceIndices[faceIndex+2] = arr[2];
+                ent->faceIndices[faceIndex] = arr[0] - 1;
+                ent->faceIndices[faceIndex+1] = arr[1] - 1;
+                ent->faceIndices[faceIndex+2] = arr[2] - 1;
                 faceIndex+=3;
                 break;
             default:
