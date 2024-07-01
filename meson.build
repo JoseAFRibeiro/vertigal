@@ -50,10 +50,12 @@ src = [
     'src/gl/callback.c',
     'src/gl/shaders.c',
     'src/gl/renderer.c',
+    'src/gl/gui.c',
     'src/gl/transformations/camera.c',
     'src/io/filemapping.c',
     'src/io/formatedprint.c',
     'src/io/fileutils.c',
+    'src/io/imageloader.c',
     'src/models/objmodel.c',
     'src/models/objutils.c',
 ]

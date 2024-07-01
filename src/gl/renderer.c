@@ -9,6 +9,7 @@
 #include "cglm/mat4.h"
 #include "cglm/cam.h"
 #include "cglm/affine.h"
+#include "vertigal/gui.h"
 
 GLint shaderProgram;
 
@@ -54,6 +55,8 @@ void renderLoop(GLFWwindow* win)
     VG_3D_ENTITY* cube = {0};
     uint32_t VBO, VAO, EBO;
 
+    guiInit(win);
+
     cube = loadModelFromObj("./res/cube.obj");
 
     if(cube == NULL) return;
@@ -96,10 +99,15 @@ void renderLoop(GLFWwindow* win)
 
     while(!glfwWindowShouldClose(win))
     {   
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glfwPollEvents();
+
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
         glEnable(GL_DEPTH_TEST);
         glClearColor(0.70f, 0.83f, 0.69f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         moveCamera(&cam, win);
 
@@ -107,9 +115,9 @@ void renderLoop(GLFWwindow* win)
         glUniformMatrix4fv(triangleTransformLoc, 1, GL_FALSE, (float *) triangleTransform);
         glUniformMatrix4fv(projectionTransformLoc, 1, GL_FALSE, (float *) projection);
         glUniformMatrix4fv(cameraTransformLoc, 1, GL_FALSE, (float *) cam.lookat);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
+        guiRender(win);
         glfwSwapBuffers(win);
     }
 }
