@@ -1,3 +1,7 @@
 .vscode
 *.csv
 *.rdc
+*.png
+*.jpg
+*.jpeg
+*.ttf
