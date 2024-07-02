@@ -1,3 +1,7 @@
+#include "glad/glad.h"
+#include <GLFW/glfw3.h>
+
+#include "stb_image.h"
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
 #define NK_INCLUDE_STANDARD_VARARGS
