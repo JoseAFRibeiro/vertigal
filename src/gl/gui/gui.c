@@ -2,16 +2,6 @@
 #include <GLFW/glfw3.h>
 #include "stb_image.h"
 
-#define NK_INCLUDE_FIXED_TYPES
-#define NK_INCLUDE_STANDARD_IO
-#define NK_INCLUDE_STANDARD_VARARGS
-#define NK_INCLUDE_DEFAULT_ALLOCATOR
-#define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
-#define NK_INCLUDE_FONT_BAKING
-#define NK_INCLUDE_DEFAULT_FONT
-#define NK_IMPLEMENTATION
-#define NK_GLFW_GL4_IMPLEMENTATION
-
 #include "nuklear.h"
 #include "nuklear_glfw_gl4.h"
 
@@ -23,8 +13,7 @@ int8_t loadGUIIcon(const char *file, struct nk_image *img_strc)
     int32_t x,y,numChannels;
     int32_t tex_h;
     uint8_t *data = NULL;
-    
-
+        
     data = stbi_load(file, &x, &y, &numChannels, 0);
 
     if(data == NULL) return -1;
@@ -58,11 +47,21 @@ void guiRender(GLFWwindow *win)
     nk_glfw3_new_frame();
     if (nk_begin(ctx, "Keep dreaming!", nk_rect(50, 50, 500, 500), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE))
     {
-        nk_layout_row_static(ctx, 200, 200, 1);
+        nk_layout_row_static(ctx, 50, 80, 1);
         if(nk_button_image(ctx, img))
         {
             fprintf(stdout, "Dream On!\n");
         }
+
+        if(nk_tree_push(ctx, NK_TREE_NODE, "Camera", NK_MINIMIZED))
+        {
+            nk_layout_row_dynamic(ctx, 30, 3);
+            nk_label(ctx, "hello!", NK_TEXT_ALIGN_CENTERED);
+            nk_label(ctx, "hello!", NK_TEXT_ALIGN_CENTERED);
+            nk_label(ctx, "hello!", NK_TEXT_ALIGN_CENTERED);
+            nk_tree_pop(ctx);
+        }
+
     }
     nk_end(ctx);
     
