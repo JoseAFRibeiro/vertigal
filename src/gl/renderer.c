@@ -110,7 +110,7 @@ void renderLoop(GLFWwindow* win)
         glClearColor(0.70f, 0.83f, 0.69f, 1.0f);
         
         moveCamera(&cam, win);
-
+        setPosition(cam.cameraPosition);
         glm_spinned(triangleTransform, glm_rad(3), cam.__cameraUp);
         glUniformMatrix4fv(triangleTransformLoc, 1, GL_FALSE, (float *) triangleTransform);
         glUniformMatrix4fv(projectionTransformLoc, 1, GL_FALSE, (float *) projection);
