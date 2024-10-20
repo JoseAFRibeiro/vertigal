@@ -33,6 +33,7 @@ uint8_t vertexFaceHandeler(file_buffer_t* restrict buffer, size_t lineLen,uint32
             cursor++; 
         }
         
+        fprintf(stdout,"current face index: %d\n",faceIndex);
         vertexFaceIndices[faceIndex] = strtol(tempBuffer1, &bufferLen, 10);
         memset(tempBuffer1, 0, sizeof(tempBuffer1));
         faceIndex++;
@@ -59,6 +60,7 @@ uint8_t vertexFaceHandeler(file_buffer_t* restrict buffer, size_t lineLen,uint32
         bufferCursor = 0;
     }
 
+    return faceIndex;
 }
 
 //TODO: handle optional W values, use len for optimisations -> use len over endline checks?
@@ -196,12 +198,14 @@ uint8_t objToVG3DEntity(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attribs, V
                 currentVertexIndex += 1; 
                 break;
             case FACE_INDEX:
-                int32_t arr[3] = {0};
-                vertexFaceHandeler(buffer, attribs->list[i].len,lineOffset, arr);
-                ent->faceIndices[faceIndex] = arr[0] - 1;
-                ent->faceIndices[faceIndex+1] = arr[1] - 1;
-                ent->faceIndices[faceIndex+2] = arr[2] - 1;
-                faceIndex+=3;
+                int32_t arr[30] = {0};
+                //a face can have more than 3 vertices...
+                uint8_t numverts = vertexFaceHandeler(buffer, attribs->list[i].len,lineOffset, arr);
+
+                for(uint32_t i = 0; i < numverts; i++)
+                {
+                    ent->faceIndices[i + faceIndex] = arr[i] - 1;   
+                }
                 break;
             default:
                 break;
