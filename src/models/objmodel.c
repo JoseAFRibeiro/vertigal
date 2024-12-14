@@ -7,13 +7,48 @@
 #include "vertigal/models.h"
 #include "vertigal/iofuncs.h"
 
+#define NUM_INDEX_PER_FACE 30
+
 static int numV = 0;
+static int32_t numGroup = -1;
+
+uint8_t groupStart(VG_3D_MODEL_GROUPS* restrict group, file_buffer_t* restrict buffer, uint32_t offset, uint32_t len)
+{
+    uint32_t cursor = offset;
+    char nameCursor = 0;
+    char groupName[256] = {0};
+
+    if(len <= 2 )
+    {
+        vg_warn("Bad group detected!");
+        numGroup--;
+        return 1;
+    }
+
+    cursor += 3;
+
+    while(buffer->buffer[cursor] != '\n')
+    {
+        groupName[nameCursor] = buffer->buffer[cursor];
+        cursor++;
+        nameCursor++;
+    }
+
+    group->groupOffset[numGroup] = offset;
+    group->currGroup = numGroup;
+    memcpy(&group->groupName[numGroup], groupName, 255);
+}   
+
+void groupEnd(VG_3D_MODEL_GROUPS* restrict group, uint32_t len)
+{
+    uint32_t currGroup = group->currGroup;
+    group->groupLen[currGroup] = len;
+}
 
 uint8_t vertexFaceHandeler(file_buffer_t* restrict buffer, size_t lineLen,uint32_t offset, 
                             int32_t* vertexFaceIndices)
 {   
-    //+3 to jump the first character + 2 follwing spaces
-    uint32_t cursor = offset + 3;
+    uint32_t cursor = offset;
     uint32_t bufferCursor = 0;
     char tempBuffer1[200] = {0};
     char tempBuffer2[200] = {0};
@@ -21,43 +56,54 @@ uint8_t vertexFaceHandeler(file_buffer_t* restrict buffer, size_t lineLen,uint32
     char* bufferLen;
     int32_t faceIndex = 0;
     
-    char* tempPtr = buffer->buffer;
-    
+    while((buffer->buffer[cursor] < '0' || buffer->buffer[cursor] > '9'))
+        cursor++;
+
     while(lineLen > (cursor - offset))
     {
-        //loop first 
-        while((buffer->buffer[cursor] >= '0' && buffer->buffer[cursor] <= '9') && buffer->buffer[cursor] != '-')
+        //loop vertex index 
+        while((buffer->buffer[cursor] >= '0' && buffer->buffer[cursor] <= '9')  && buffer->buffer[cursor] != '-')
         {     
             tempBuffer1[bufferCursor] = buffer->buffer[cursor];
             bufferCursor++;
             cursor++; 
         }
-        
-        fprintf(stdout,"current face index: %d\n",faceIndex);
+
         vertexFaceIndices[faceIndex] = strtol(tempBuffer1, &bufferLen, 10);
         memset(tempBuffer1, 0, sizeof(tempBuffer1));
         faceIndex++;
-        cursor++;
         bufferCursor = 0;
 
-        while((buffer->buffer[cursor] >= '0' && buffer->buffer[cursor] <= '9') && buffer->buffer[cursor] != '-')
-        {     
-            tempBuffer2[bufferCursor] = buffer->buffer[cursor];
-            bufferCursor++;
-            cursor++; 
+        //loop texture index
+        if(buffer->buffer[cursor] == '/')
+        {
+            while((buffer->buffer[cursor] >= '0' && buffer->buffer[cursor] <= '9')  && buffer->buffer[cursor] != '-')
+            {     
+                tempBuffer2[bufferCursor] = buffer->buffer[cursor];
+                bufferCursor++;
+                cursor++; 
+            }
+            
+            cursor++;
+            bufferCursor = 0;
+        }
+
+        
+        //loop normal index
+        if(buffer->buffer[cursor] == '/')
+        {
+            cursor++;
+            while((buffer->buffer[cursor] >= '0' && buffer->buffer[cursor] <= '9')  && buffer->buffer[cursor] != '-')
+            {     
+                tempBuffer3[bufferCursor] = buffer->buffer[cursor];
+                bufferCursor++;
+                cursor++; 
+            }
         }
 
         cursor++;
         bufferCursor = 0;
-        while((buffer->buffer[cursor] >= '0' && buffer->buffer[cursor] <= '9') && buffer->buffer[cursor] != '-')
-        {     
-            tempBuffer3[bufferCursor] = buffer->buffer[cursor];
-            bufferCursor++;
-            cursor++; 
-        }
 
-        cursor += 2;
-        bufferCursor = 0;
     }
 
     return faceIndex;
@@ -73,7 +119,7 @@ uint8_t vertexHandeler(file_buffer_t* restrict buffer, uint32_t len, uint32_t of
     char *bufferLen;
     while(true)
     {
-        if((buffer->buffer[cursor] >= '0') && (buffer->buffer[cursor] <= '9'))
+        if((buffer->buffer[cursor] >= '0') && (buffer->buffer[cursor] <= '9') || (buffer->buffer[cursor] == '-'))
         {
             bufferCursor = 0;
 
@@ -108,10 +154,11 @@ uint8_t retrieveModelMetadata(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attr
 {
     char* lnBuffer;
     uint16_t lnIdentifier;
-    uint8_t result;
     size_t lnCursor;
-    size_t* lineStartOffset = &buffer->__cursor;
+    
     bool quit = false;
+    size_t* lineStartOffset = &buffer->__cursor;
+    uint8_t result = 0;
     VG_OBJ_LINE_t lineObj = {0};
 
     do
@@ -136,7 +183,7 @@ uint8_t retrieveModelMetadata(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attr
 
         switch (lnIdentifier)
         {
-            case OBJ_VERTEX_ID :
+            case OBJ_VERTEX_ID:
                 lineObj.lineType = GEOMETRIC_VERTEX;
                 attribs->numVerts++;
                 result = VG_arrayListAddElement(&attribs, &lineObj);
@@ -150,7 +197,13 @@ uint8_t retrieveModelMetadata(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attr
                 lineObj.lineType = FACE_INDEX;
                 attribs->numFaces++;
                 result = VG_arrayListAddElement(&attribs, &lineObj);
-                break;        
+                break;  
+            case OBJ_GROUP_ID_1:
+            case OBJ_GROUP_ID_2:
+                lineObj.lineType = GROUP;
+                attribs->numGroups++;
+                VG_arrayListAddElement(&attribs, &lineObj);
+                break;      
             default:
             break;
         }
@@ -168,6 +221,7 @@ uint8_t retrieveModelMetadata(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attr
         lnBuffer = NULL;
     } while (!quit);
     
+    printf("Number of groups %d\n", attribs->numGroups);
     return 0;
 }
 
@@ -175,10 +229,15 @@ uint8_t objToVG3DEntity(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attribs, V
 {
     uint32_t currentVertexIndex = 0;
     uint32_t faceIndex = 0;
+    uint32_t groupLen = 0;
+    
+    memset(&ent->groups, 0, sizeof(VG_3D_MODEL_GROUPS));
     ent->attribs.numVertices = attribs->numVerts;
     ent->attribs.numFaces = attribs->numFaces;
     ent->vertexArray = malloc(attribs->numVerts * sizeof(vec3));
-    ent->faceIndices = malloc((attribs->numFaces * sizeof(int32_t)) * 3);
+    
+    //breaking because I presumed all faces only had 3 indices
+    ent->faceIndices = malloc((attribs->numFaces * sizeof(int32_t)) * NUM_INDEX_PER_FACE);
     
     if((ent->vertexArray == NULL) || (ent->faceIndices == NULL))
         return 1;
@@ -186,7 +245,7 @@ uint8_t objToVG3DEntity(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attribs, V
     for(uint32_t i = 0; i < attribs->currPosition; i++)
     {
         uint32_t lineLen = attribs->list[i].len;
-        uint32_t lineOffset = attribs->list[i]. offset;
+        uint32_t lineOffset = attribs->list[i].offset;
         vec3 tempVec = {0};
         switch(attribs->list[i].lineType)
         {
@@ -198,19 +257,29 @@ uint8_t objToVG3DEntity(file_buffer_t* buffer, VG_OBJ_ATTRIB_ARRAY_t* attribs, V
                 currentVertexIndex += 1; 
                 break;
             case FACE_INDEX:
-                int32_t arr[30] = {0};
+                int32_t arr[256] = {0};
+                int32_t currFaceIndex = faceIndex;
                 //a face can have more than 3 vertices...
                 uint8_t numverts = vertexFaceHandeler(buffer, attribs->list[i].len,lineOffset, arr);
-
-                for(uint32_t i = 0; i < numverts; i++)
+                //do we need to triangulate?
+                for(uint32_t t = 0; t < numverts; t++)
                 {
-                    ent->faceIndices[i + faceIndex] = arr[i] - 1;   
+                    ent->faceIndices[t + currFaceIndex] = arr[t] - 1;   
+                    faceIndex++;
+                    groupLen++;
                 }
                 break;
+                case GROUP:
+                    groupEnd(&ent->groups, groupLen);
+                    numGroup++;
+                    groupLen = 0;
+                    groupStart(&ent->groups, buffer, faceIndex + 1, lineLen);
+                    break;
             default:
                 break;
         }
     }
+    ent->groups.numGroups = numGroup + 1;
     return 0;
 }   
 
@@ -222,6 +291,7 @@ VG_3D_ENTITY* loadModelFromObj(const char* restrict path)
     file_buffer_t fb;
     VG_OBJ_ATTRIB_ARRAY_t attribArray = {0};
 
+    numV = 0;
     fb.__cursor = 0;
     fb.buffer = readFileToBuffer(&bufferLen, path);
 

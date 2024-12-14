@@ -9,6 +9,18 @@
 #define OBJ_VERTEX_ID 0x2076
 #define OBJ_TEX_ID 0x6E76
 #define OBJ_FACE_ID 0x2066
+#define OBJ_GROUP_ID_1 0x670A
+#define OBJ_GROUP_ID_2 0x2067
+
+typedef struct
+{
+    uint32_t groupOffset[256];
+    uint32_t groupLen[256];
+    uint32_t numGroups;
+    uint32_t currGroup;
+    char groupName[255][256];
+}VG_3D_MODEL_GROUPS;
+
 
 typedef struct{
     uint32_t numVertices;
@@ -20,6 +32,7 @@ typedef struct{
     vec3* vertexArray;
     int32_t* faceIndices;
     VG_3D_MODEL_ATTRIBUTES attribs;
+    VG_3D_MODEL_GROUPS groups;
 }VG_3D_ENTITY;
 
 typedef enum {
@@ -28,7 +41,8 @@ typedef enum {
     VERTEX_TEXTURE,
     FACE_INDEX,
     MATERIAL,
-    LINE_ELEMENT
+    LINE_ELEMENT,
+    GROUP
 }VG_ENUM_LINE_TYPE;
 
 typedef enum{
@@ -52,6 +66,7 @@ typedef struct{
     uint32_t numVerts;
     uint32_t numFaces;
     uint32_t numTex;
+    uint32_t numGroups;
     VG_OBJ_LINE_t* list; 
 }VG_OBJ_ATTRIB_ARRAY_t;
 

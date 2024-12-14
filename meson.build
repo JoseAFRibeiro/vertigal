@@ -27,6 +27,7 @@ if sys == 'windows'
         args = [
             '/DDEBUG',
             '/D_win32',
+            '/GS',
             '/VERBOSE:LIB',
         ]     
         linker_args = ['/MACHINE:x64']

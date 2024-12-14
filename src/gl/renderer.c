@@ -55,9 +55,9 @@ void renderLoop(GLFWwindow* win)
     VG_3D_ENTITY* cube = {0};
     uint32_t VBO, VAO, EBO;
 
-    guiInit(win);
+    //guiInit(win);
 
-    cube = loadModelFromObj("./res/cube.obj");
+    cube = loadModelFromObj("./res/cessna_tri.obj");
 
     if(cube == NULL) return;
     glUseProgram(shaderProgram);
@@ -107,17 +107,28 @@ void renderLoop(GLFWwindow* win)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
         glEnable(GL_DEPTH_TEST);
-        glClearColor(0.70f, 0.83f, 0.69f, 1.0f);
+        glClearColor(0.50f, 0.70f, 0.40f, 1.0f);
         
         moveCamera(&cam, win);
-        setPosition(cam.cameraPosition);
-        glm_spinned(triangleTransform, glm_rad(3), cam.__cameraUp);
+        //setPosition(cam.cameraPosition);
+        glm_spinned(triangleTransform, glm_rad(0.3f), cam.__cameraUp);
         glUniformMatrix4fv(triangleTransformLoc, 1, GL_FALSE, (float *) triangleTransform);
         glUniformMatrix4fv(projectionTransformLoc, 1, GL_FALSE, (float *) projection);
         glUniformMatrix4fv(cameraTransformLoc, 1, GL_FALSE, (float *) cam.lookat);
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
-        guiRender(win);
+        glDrawElements(GL_TRIANGLES, cube->attribs.numFaces, GL_UNSIGNED_INT, 0);
+        
+        /*for (uint32_t groups = 0; groups < cube->groups.numGroups; groups++)
+        {
+            if(cube->groups.groupLen[groups] < 1)
+                continue;
+
+            glDrawElements(GL_TRIANGLES, cube->groups.groupLen[groups], GL_UNSIGNED_INT, cube->groups.groupOffset[groups]);
+        }*/
+        
+
+        //guiRender(win);
+
         glfwSwapBuffers(win);
     }
 }

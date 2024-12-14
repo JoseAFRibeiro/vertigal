@@ -8,7 +8,7 @@ VG_PLAYER_CAMERA cameraSetup()
     vec3 center = {0.0f, 0.0f, 0.0f};
     
     VG_PLAYER_CAMERA camera = {
-        .cameraPosition = {0.0f, 0.0f, 3.0f},
+        .cameraPosition = {0.0f, 0.0f, 60.0f},
         .cameraTarget = {0.0f, 0.0f, 0.0f},
         .cameraDirection = {0.0f},
         .__cameraFront = {0.0f, 0.0f, -1.0f},
