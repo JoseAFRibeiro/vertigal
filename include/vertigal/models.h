@@ -35,45 +35,6 @@ typedef struct{
     VG_3D_MODEL_GROUPS groups;
 }VG_3D_ENTITY;
 
-typedef enum {
-    GEOMETRIC_VERTEX,
-    VERTEX_NORMAL,
-    VERTEX_TEXTURE,
-    FACE_INDEX,
-    MATERIAL,
-    LINE_ELEMENT,
-    GROUP
-}VG_ENUM_LINE_TYPE;
-
-typedef enum{
-    VERTEX_ONLY,
-    VT_INDEX,
-    VTN_INDEX,
-    VN_INDEX
-}VG_OBJ_FACE_TYPE;
-
-typedef struct {
-    VG_ENUM_LINE_TYPE lineType;
-    uint32_t len;
-    uint32_t offset;
-}VG_OBJ_LINE_t;
-
-typedef struct{
-    size_t sizeOfArray;
-    size_t currNumElements;
-    size_t currSizeElements;
-    size_t currPosition;
-    uint32_t numVerts;
-    uint32_t numFaces;
-    uint32_t numTex;
-    uint32_t numGroups;
-    VG_OBJ_LINE_t* list; 
-}VG_OBJ_ATTRIB_ARRAY_t;
-
-uint8_t VG_InitLineAttribArray(VG_OBJ_ATTRIB_ARRAY_t* array, size_t initialSize);
-uint8_t VG_arrayListSetElementAtIndex(VG_OBJ_ATTRIB_ARRAY_t** restrict array, size_t index, VG_OBJ_LINE_t* restrict value);
-uint8_t VG_arrayListAddElement(VG_OBJ_ATTRIB_ARRAY_t** restrict array, VG_OBJ_LINE_t* restrict value);
-void VG_arrayListFree(VG_OBJ_ATTRIB_ARRAY_t* array);
 VG_3D_ENTITY* loadModelFromObj(const char* restrict path);
 
 

@@ -27,13 +27,13 @@ if sys == 'windows'
         args = [
             '/DDEBUG',
             '/D_win32',
-            '/GS',
-            '/VERBOSE:LIB',
+            '/GS'
         ]     
         linker_args = ['/MACHINE:x64']
     endif
 endif
     cglm_path = get_option('cglm_path')
+    cglm_lib = get_option('cglm_lib_option')
     glfw_path = get_option('glfw_path')
     glfw_lib = get_option('glfw_lib_option')
 
@@ -42,7 +42,7 @@ endif
     include += cglm_path / 'include'
 
     glfw_dep = compiler.find_library('glfw3', dirs: glfw_path / glfw_lib, static: true)
-    cglm_dep = compiler.find_library('cglm', dirs: cglm_path / 'build')
+    cglm_dep = compiler.find_library('cglm', dirs: cglm_path / cglm_lib)
 
 src = [
     'src/main.c',
@@ -59,7 +59,7 @@ src = [
     'src/io/fileutils.c',
     'src/io/imageloader.c',
     'src/models/objmodel.c',
-    'src/models/objutils.c',
+    'src/models/object_arena.c',
 ]
 
 

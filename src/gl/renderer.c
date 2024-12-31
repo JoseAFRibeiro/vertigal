@@ -9,7 +9,7 @@
 #include "cglm/mat4.h"
 #include "cglm/cam.h"
 #include "cglm/affine.h"
-#include "vertigal/gui.h"
+#include "vertigal/arena.h"
 
 GLint shaderProgram;
 
@@ -52,26 +52,31 @@ unsigned int indices[] = {
 
 void renderLoop(GLFWwindow* win)
 {
-    VG_3D_ENTITY* cube = {0};
+    VG_3D_ENTITY* model1 = {0};
+    VG_3D_ENTITY* model2 = {0};
     uint32_t VBO, VAO, EBO;
-
     //guiInit(win);
 
-    cube = loadModelFromObj("./res/cessna_tri.obj");
+    model1 = loadModelFromObj("./res/cessna_tri.obj");
+    model2 = loadModelFromObj("./res/cow.obj");
 
-    if(cube == NULL) return;
+
+    VERTIGAL_MODEL_ARENA* arena = getArenaptr();
+    VERTIGAL_ARENA_MODEL_IDENTIFIER id = arena->modelHandlePool[0];
+    
+    //if(cube == NULL) return;
     glUseProgram(shaderProgram);
 
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, cube->attribs.numFaces * sizeof(uint32_t) * 3, cube->faceIndices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, (arena->sizeIndexes - arena->freeIndexes) * sizeof(uint32_t) * 3, arena->indexes, GL_STATIC_DRAW);
     //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
     //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * cube->attribs.numVertices, cube->vertexArray, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * (arena->sizeVertices - arena->freeVertices), arena->vertices, GL_STATIC_DRAW);
 
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -96,7 +101,7 @@ void renderLoop(GLFWwindow* win)
 
     glfwSwapInterval(1);
     glBindVertexArray(VAO);
-
+    //glDisable(GL_CULL_FACE);
     while(!glfwWindowShouldClose(win))
     {   
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -116,16 +121,7 @@ void renderLoop(GLFWwindow* win)
         glUniformMatrix4fv(projectionTransformLoc, 1, GL_FALSE, (float *) projection);
         glUniformMatrix4fv(cameraTransformLoc, 1, GL_FALSE, (float *) cam.lookat);
 
-        glDrawElements(GL_TRIANGLES, cube->attribs.numFaces, GL_UNSIGNED_INT, 0);
-        
-        /*for (uint32_t groups = 0; groups < cube->groups.numGroups; groups++)
-        {
-            if(cube->groups.groupLen[groups] < 1)
-                continue;
-
-            glDrawElements(GL_TRIANGLES, cube->groups.groupLen[groups], GL_UNSIGNED_INT, cube->groups.groupOffset[groups]);
-        }*/
-        
+        glDrawElements(GL_TRIANGLES, id.indexLen, GL_UNSIGNED_INT, id.indexStart);
 
         //guiRender(win);
 
