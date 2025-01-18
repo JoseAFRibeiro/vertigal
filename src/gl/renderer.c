@@ -56,27 +56,29 @@ void renderLoop(GLFWwindow* win)
     VG_3D_ENTITY* model2 = {0};
     uint32_t VBO, VAO, EBO;
     //guiInit(win);
-
-    model1 = loadModelFromObj("./res/teapot.obj");
+    int idx = 0;
+    model1 = loadModelFromObj("./res/cessna_tri.obj");
     model2 = loadModelFromObj("./res/cow.obj");
 
 
     VERTIGAL_MODEL_ARENA* arena = getArenaptr();
-    VERTIGAL_ARENA_MODEL_IDENTIFIER id = arena->modelHandlePool[0];
+    VERTIGAL_ARENA_MODEL_IDENTIFIER id = arena->modelHandlePool[idx];
+    VERTIGAL_ARENA_MODEL_IDENTIFIER id2 = arena->modelHandlePool[idx+1];
+
     
     //if(cube == NULL) return;
     glUseProgram(shaderProgram);
 
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, (arena->sizeIndexes - arena->freeIndexes) * sizeof(uint32_t) * 3, arena->indexes, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, (arena->sizeIndexes) * sizeof(uint32_t) * 3, arena->indexes, GL_STATIC_DRAW);
     //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
     //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * (arena->sizeVertices - arena->freeVertices), arena->vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * (arena->sizeVertices), arena->vertices, GL_STATIC_DRAW);
 
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -107,6 +109,13 @@ void renderLoop(GLFWwindow* win)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glfwPollEvents();
 
+        if(glfwGetKey(win, GLFW_KEY_ENTER )== GLFW_PRESS)
+        {
+            idx = !idx;
+            id = arena->modelHandlePool[idx];
+            printf("IDX: %d\n", idx);
+        }
+
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -122,6 +131,8 @@ void renderLoop(GLFWwindow* win)
         glUniformMatrix4fv(cameraTransformLoc, 1, GL_FALSE, (float *) cam.lookat);
 
         glDrawElements(GL_TRIANGLES, id.indexLen, GL_UNSIGNED_INT, id.indexStart);
+        glDrawElements(GL_TRIANGLES, id2.indexLen, GL_UNSIGNED_INT, id2.indexStart);
+
 
         //guiRender(win);
 

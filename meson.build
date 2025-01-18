@@ -5,7 +5,10 @@ sys = build_machine.system()
 
 if sys == 'linux'
     args = [
-        '-DDEBUG'
+        '-DDEBUG',
+        '-static-libasan',
+        '-fstack-protector-all'
+
     ]
     linker_args = [
         '-lm'
@@ -31,7 +34,6 @@ if sys == 'windows'
         ]     
         linker_args = ['/MACHINE:x64']
     endif
-endif
     cglm_path = get_option('cglm_path')
     cglm_lib = get_option('cglm_lib_option')
     glfw_path = get_option('glfw_path')
@@ -43,6 +45,7 @@ endif
 
     glfw_dep = compiler.find_library('glfw3', dirs: glfw_path / glfw_lib, static: true)
     cglm_dep = compiler.find_library('cglm', dirs: cglm_path / cglm_lib)
+endif
 
 src = [
     'src/main.c',

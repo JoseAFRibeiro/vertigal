@@ -62,7 +62,7 @@ void faceHandler(int32_t* results, const char* restrict line)
     {   
         faceCursor++;
 
-        while(line[faceCursor] != '/' && line[faceCursor] != ' ' && line[faceCursor] != '\r' )
+        while(line[faceCursor] != '/' && line[faceCursor] != ' ' && line[faceCursor] != '\r' && line[faceCursor] != '\0' )
         {
             indexString[stringCursor] = line[faceCursor];
 
@@ -84,6 +84,8 @@ void faceHandler(int32_t* results, const char* restrict line)
 
     return;
 }
+
+static int32_t lineNum = 0;
 
 VG_3D_ENTITY* modelLineParser(file_buffer_t file)
 {
@@ -107,19 +109,23 @@ VG_3D_ENTITY* modelLineParser(file_buffer_t file)
         
         cursor++;
     }
-
+    
     cursor = 0;
 
     int repeat = 0;
 
     for (int32_t line = 0; line <= lineCount; line++)
     {
+        lineNum++;
+        printf("Line number %d \n", lineNum);
+
         uint32_t lineStartOffset = 0;
-        uint32_t indexOut[3] = {0};
+        int32_t indexOut[3] = {0};
         float vertexOut[3] = {0};
         while(file.buffer[cursor + lineStartOffset] != '\n' && file.buffer[cursor + lineStartOffset] != '\0')
             lineStartOffset++;
         memcpy(lineBuffer, &file.buffer[cursor], lineStartOffset);
+
 
         /*
             Do stuff with the line
