@@ -57,7 +57,7 @@ void renderLoop(GLFWwindow* win)
     uint32_t VBO, VAO, EBO;
     //guiInit(win);
 
-    model1 = loadModelFromObj("./res/cessna_tri.obj");
+    model1 = loadModelFromObj("./res/teapot.obj");
     model2 = loadModelFromObj("./res/cow.obj");
 
 

@@ -110,12 +110,13 @@ VG_3D_ENTITY* modelLineParser(file_buffer_t file)
 
     cursor = 0;
 
+    int repeat = 0;
+
     for (int32_t line = 0; line <= lineCount; line++)
     {
         uint32_t lineStartOffset = 0;
         uint32_t indexOut[3] = {0};
         float vertexOut[3] = {0};
-
         while(file.buffer[cursor + lineStartOffset] != '\n' && file.buffer[cursor + lineStartOffset] != '\0')
             lineStartOffset++;
         memcpy(lineBuffer, &file.buffer[cursor], lineStartOffset);
@@ -135,6 +136,8 @@ VG_3D_ENTITY* modelLineParser(file_buffer_t file)
                 break;
             case 'f':
                 faceHandler(indexOut, lineBuffer);
+                repeat++;
+                printf("%d\n", repeat);
                 ent->faceIndices[indexCount] = indexOut[0] - 1;
                 indexCount++;
                 ent->faceIndices[indexCount] = indexOut[1] - 1 ;
