@@ -54,7 +54,7 @@ void renderLoop(GLFWwindow* win)
 {
     VG_3D_ENTITY* model1 = {0};
     VG_3D_ENTITY* model2 = {0};
-    uint32_t VBO, VAO, EBO;
+    uint32_t VBO, VAO, VAO2, EBO, VBO2, EBO2;
     //guiInit(win);
     int idx = 0;
     model1 = loadModelFromObj("./res/cessna_tri.obj");
@@ -62,27 +62,33 @@ void renderLoop(GLFWwindow* win)
 
 
     VERTIGAL_MODEL_ARENA* arena = getArenaptr();
+    
     VERTIGAL_ARENA_MODEL_IDENTIFIER id = arena->modelHandlePool[idx];
     VERTIGAL_ARENA_MODEL_IDENTIFIER id2 = arena->modelHandlePool[idx+1];
 
+    VERTIGAL_ARENA_MODEL_IDENTIFIER id_arr[2] = {id, id2};
     
     //if(cube == NULL) return;
     glUseProgram(shaderProgram);
 
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, (arena->sizeIndexes) * sizeof(uint32_t) * 3, arena->indexes, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, (arena->sizeIndexes - arena->freeIndexes) * sizeof(uint32_t), arena->indexes, GL_STATIC_DRAW);
     //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * (arena->sizeVertices), arena->vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * (arena->sizeVertices - arena->freeVertices), arena->vertices, GL_STATIC_DRAW);
 
     glGenVertexArrays(1, &VAO);
+    glGenVertexArrays(1, &VAO2);
+
     glBindVertexArray(VAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(VAO2);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) (id.verticesSLen * sizeof(vec3)));
     glEnableVertexAttribArray(0);
 
     /*Temporary triangle transform*/
@@ -103,13 +109,18 @@ void renderLoop(GLFWwindow* win)
 
     glfwSwapInterval(1);
     glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
+
     //glDisable(GL_CULL_FACE);
     while(!glfwWindowShouldClose(win))
     {   
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glfwPollEvents();
 
-        if(glfwGetKey(win, GLFW_KEY_ENTER )== GLFW_PRESS)
+        if(glfwGetKey(win, GLFW_KEY_ENTER ) == GLFW_PRESS)
         {
             idx = !idx;
             id = arena->modelHandlePool[idx];
@@ -117,8 +128,6 @@ void renderLoop(GLFWwindow* win)
         }
 
         glUseProgram(shaderProgram);
-        glBindVertexArray(VAO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
         glEnable(GL_DEPTH_TEST);
         glClearColor(0.50f, 0.70f, 0.40f, 1.0f);
@@ -130,9 +139,20 @@ void renderLoop(GLFWwindow* win)
         glUniformMatrix4fv(projectionTransformLoc, 1, GL_FALSE, (float *) projection);
         glUniformMatrix4fv(cameraTransformLoc, 1, GL_FALSE, (float *) cam.lookat);
 
-        glDrawElements(GL_TRIANGLES, id.indexLen, GL_UNSIGNED_INT, id.indexStart);
-        glDrawElements(GL_TRIANGLES, id2.indexLen, GL_UNSIGNED_INT, id2.indexStart);
+        //glDrawElements(GL_TRIANGLES, id.indexLen, GL_UNSIGNED_INT, id.indexStart);
+        glBindVertexArray(VAO);
+        glEnableVertexAttribArray(0);        
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glDrawElements(GL_TRIANGLES, id_arr[0].indexLen, GL_UNSIGNED_INT, (void*) (id_arr[0].indexStart * sizeof(int32_t)));
+        glDisableVertexAttribArray(0);
 
+        glBindVertexArray(VAO2);
+        glEnableVertexAttribArray(0);        
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glDrawElements(GL_TRIANGLES, id_arr[1].indexLen, GL_UNSIGNED_INT, (void*) (id_arr[1].indexStart * sizeof(int32_t)));
+        glDisableVertexAttribArray(0);
 
         //guiRender(win);
 

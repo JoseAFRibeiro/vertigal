@@ -85,8 +85,6 @@ void faceHandler(int32_t* results, const char* restrict line)
     return;
 }
 
-static int32_t lineNum = 0;
-
 VG_3D_ENTITY* modelLineParser(file_buffer_t file)
 {
     VG_3D_ENTITY *ent =  NULL;
@@ -116,8 +114,6 @@ VG_3D_ENTITY* modelLineParser(file_buffer_t file)
 
     for (int32_t line = 0; line <= lineCount; line++)
     {
-        lineNum++;
-        printf("Line number %d \n", lineNum);
 
         uint32_t lineStartOffset = 0;
         int32_t indexOut[3] = {0};
