@@ -57,7 +57,7 @@ void renderLoop(GLFWwindow* win)
     uint32_t VBO, VAO, VAO2, EBO, VBO2, EBO2;
     //guiInit(win);
     int idx = 0;
-    model1 = loadModelFromObj("./res/cessna_tri.obj");
+    model1 = loadModelFromObj("./res/cube.obj");
     model2 = loadModelFromObj("./res/cow.obj");
 
 
@@ -92,8 +92,9 @@ void renderLoop(GLFWwindow* win)
     glEnableVertexAttribArray(0);
 
     /*Temporary triangle transform*/
-    mat4 triangleTransform = GLM_MAT4_IDENTITY_INIT;
-    GLint triangleTransformLoc = glGetUniformLocation(shaderProgram, "model");
+    mat4 cowTransform = GLM_MAT4_IDENTITY_INIT;
+    mat4 cubeTransform = GLM_MAT4_IDENTITY_INIT;
+    GLint objectTransformLoc = glGetUniformLocation(shaderProgram, "model");
     /*Temporary triangle transform*/
     
     /*Temporary camera transform*/
@@ -107,6 +108,16 @@ void renderLoop(GLFWwindow* win)
     GLint projectionTransformLoc = glGetUniformLocation(shaderProgram, "projection");
     /*Temporary projection transform*/
 
+    /*temporary light and cow color*/
+    
+    vec3 light = {1.0f, 1.0f, 1.0f};
+    vec3 cubeColor = {1.0f, 1.0f, 1.0f};
+    vec3 cowColor = {1.0f, 0.5f, 0.31f};
+
+    GLint lightUniformLocation = glGetUniformLocation(shaderProgram, "lightColor");
+    GLint objectColorUniformLocation = glGetUniformLocation(shaderProgram, "objectColor");
+    /*temporary light and cow color*/
+
     glfwSwapInterval(1);
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -114,7 +125,10 @@ void renderLoop(GLFWwindow* win)
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
 
-    //glDisable(GL_CULL_FACE);
+    vec3 cubeTranslate = {10.0f, 0.0f, 0.0f};
+    glm_translate(cubeTransform, cubeTranslate);
+
+    glDisable(GL_CULL_FACE);
     while(!glfwWindowShouldClose(win))
     {   
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -134,23 +148,31 @@ void renderLoop(GLFWwindow* win)
         
         moveCamera(&cam, win);
         //setPosition(cam.cameraPosition);
-        glm_spinned(triangleTransform, glm_rad(0.3f), cam.__cameraUp);
-        glUniformMatrix4fv(triangleTransformLoc, 1, GL_FALSE, (float *) triangleTransform);
         glUniformMatrix4fv(projectionTransformLoc, 1, GL_FALSE, (float *) projection);
         glUniformMatrix4fv(cameraTransformLoc, 1, GL_FALSE, (float *) cam.lookat);
+        glUniform3fv(lightUniformLocation, 1, (float *) light);
 
         //glDrawElements(GL_TRIANGLES, id.indexLen, GL_UNSIGNED_INT, id.indexStart);
         glBindVertexArray(VAO);
         glEnableVertexAttribArray(0);        
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        
+        glUniformMatrix4fv(objectTransformLoc, 1, GL_FALSE, (float *) cubeTransform);
+        glUniform3fv(objectColorUniformLocation, 1 , (float *) cubeColor);
         glDrawElements(GL_TRIANGLES, id_arr[0].indexLen, GL_UNSIGNED_INT, (void*) (id_arr[0].indexStart * sizeof(int32_t)));
         glDisableVertexAttribArray(0);
+
+        glm_spinned(cowTransform, glm_rad(0.3f), cam.__cameraUp);
 
         glBindVertexArray(VAO2);
         glEnableVertexAttribArray(0);        
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        
+        glUniform3fv(objectColorUniformLocation, 1, (float *) cowColor);
+        
+        glUniformMatrix4fv(objectTransformLoc, 1, GL_FALSE, (float *) cowTransform);
         glDrawElements(GL_TRIANGLES, id_arr[1].indexLen, GL_UNSIGNED_INT, (void*) (id_arr[1].indexStart * sizeof(int32_t)));
         glDisableVertexAttribArray(0);
 

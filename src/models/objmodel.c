@@ -60,7 +60,12 @@ void faceHandler(int32_t* results, const char* restrict line)
 
     while(line[faceCursor] != '\0' && line[faceCursor] != '\r' && line[faceCursor] != '\n')
     {   
-        faceCursor++;
+
+        while (line[faceCursor] < '0' || line[faceCursor] > '9') 
+        {
+            faceCursor++;
+        }
+        
 
         while(line[faceCursor] != '/' && line[faceCursor] != ' ' && line[faceCursor] != '\r' && line[faceCursor] != '\0' )
         {
@@ -130,6 +135,12 @@ VG_3D_ENTITY* modelLineParser(file_buffer_t file)
        switch (lineBuffer[0])
         {
             case 'v':
+
+                    if(lineBuffer[1] == 'n')
+                {
+                    break;
+                }
+                
                 vertexHandler(vertexOut, lineBuffer);
                 ent->vertexArray[vertCount][0] = vertexOut[0];
                 ent->vertexArray[vertCount][1] = vertexOut[1];
