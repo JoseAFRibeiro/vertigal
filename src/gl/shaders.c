@@ -60,6 +60,11 @@ GLuint compileShaderProgram(VG_shader_packet p)
 
     glAttachShader(program, p.fragment);
     glAttachShader(program, p.vertex);
+    
+    if(p.numShaders > 2)
+    {
+        glAttachShader(program, p.geometry);
+    }
 
     //TODO: add logic to attach other shaders
 
@@ -78,11 +83,21 @@ GLuint compileShaderProgram(VG_shader_packet p)
         glDeleteShader(p.vertex);
         glDeleteProgram(program);
 
+        if(p.numShaders > 2)
+        {
+            glDeleteShader(p.geometry);
+        }
+
         return 0;
     }
 
     glDeleteShader(p.fragment);
     glDeleteShader(p.vertex);
+
+    if(p.numShaders > 2)
+    {
+        glDeleteShader(p.geometry);
+    }
 
     return program;
 }

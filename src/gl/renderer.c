@@ -12,6 +12,8 @@
 #include "vertigal/arena.h"
 
 GLint shaderProgram;
+GLint shaderProgram2;
+
 
 uint8_t rendererSetup(void)
 {
@@ -19,8 +21,17 @@ uint8_t rendererSetup(void)
 
     packet.vertex = compileShader("./res/vertex.glsl", GL_VERTEX_SHADER);
     packet.fragment = compileShader("./res/fragment.glsl", GL_FRAGMENT_SHADER);
-    
+    packet.numShaders = 2;
+
     shaderProgram = compileShaderProgram(packet);
+
+    packet.vertex = compileShader("./res/vertex.glsl", GL_VERTEX_SHADER);
+    packet.fragment = compileShader("./res/lighting.glsl", GL_FRAGMENT_SHADER);
+    packet.geometry = compileShader("./res/geometry.glsl", GL_GEOMETRY_SHADER);
+    packet.numShaders = 3;
+    
+    shaderProgram2 = compileShaderProgram(packet);
+
     return 0;
 }
 
@@ -115,7 +126,7 @@ void renderLoop(GLFWwindow* win)
     vec3 cowColor = {1.0f, 0.5f, 0.31f};
 
     GLint lightUniformLocation = glGetUniformLocation(shaderProgram, "lightColor");
-    GLint objectColorUniformLocation = glGetUniformLocation(shaderProgram, "objectColor");
+    GLint objectColorUniformLocation = glGetUniformLocation(shaderProgram2, "objectColor");
     /*temporary light and cow color*/
 
     glfwSwapInterval(1);
@@ -143,6 +154,12 @@ void renderLoop(GLFWwindow* win)
 
         glUseProgram(shaderProgram);
 
+        objectTransformLoc = glGetUniformLocation(shaderProgram, "model");
+        cameraTransformLoc = glGetUniformLocation(shaderProgram, "view");
+        projectionTransformLoc = glGetUniformLocation(shaderProgram, "projection");
+        lightUniformLocation = glGetUniformLocation(shaderProgram, "lightColor");
+        objectColorUniformLocation = glGetUniformLocation(shaderProgram, "objectColor");
+
         glEnable(GL_DEPTH_TEST);
         glClearColor(0.50f, 0.70f, 0.40f, 1.0f);
         
@@ -152,7 +169,6 @@ void renderLoop(GLFWwindow* win)
         glUniformMatrix4fv(cameraTransformLoc, 1, GL_FALSE, (float *) cam.lookat);
         glUniform3fv(lightUniformLocation, 1, (float *) light);
 
-        //glDrawElements(GL_TRIANGLES, id.indexLen, GL_UNSIGNED_INT, id.indexStart);
         glBindVertexArray(VAO);
         glEnableVertexAttribArray(0);        
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -164,15 +180,29 @@ void renderLoop(GLFWwindow* win)
         glDisableVertexAttribArray(0);
 
         glm_spinned(cowTransform, glm_rad(0.3f), cam.__cameraUp);
+        
+        glUseProgram(shaderProgram2);
+
+        objectTransformLoc = glGetUniformLocation(shaderProgram2, "model");
+        cameraTransformLoc = glGetUniformLocation(shaderProgram2, "view");
+        projectionTransformLoc = glGetUniformLocation(shaderProgram2, "projection");
+        lightUniformLocation = glGetUniformLocation(shaderProgram2, "lightColor");
+        objectColorUniformLocation = glGetUniformLocation(shaderProgram2, "objectColor");
+        GLint lightPosUniformLocation = glGetUniformLocation(shaderProgram2, "lightPos");
 
         glBindVertexArray(VAO2);
         glEnableVertexAttribArray(0);        
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        
-        glUniform3fv(objectColorUniformLocation, 1, (float *) cowColor);
-        
+
+        glUniformMatrix4fv(projectionTransformLoc, 1, GL_FALSE, (float *) projection);
         glUniformMatrix4fv(objectTransformLoc, 1, GL_FALSE, (float *) cowTransform);
+        glUniformMatrix4fv(cameraTransformLoc, 1, GL_FALSE, (float *) cam.lookat);
+        glUniform3fv(objectColorUniformLocation, 1, (float *) cowColor);
+        glUniform3fv(lightUniformLocation, 1, (float *) light);
+        glUniform3fv(lightPosUniformLocation, 1, (float *) cubeTranslate);
+
+
         glDrawElements(GL_TRIANGLES, id_arr[1].indexLen, GL_UNSIGNED_INT, (void*) (id_arr[1].indexStart * sizeof(int32_t)));
         glDisableVertexAttribArray(0);
 

@@ -6,6 +6,7 @@
 typedef struct {
     GLuint fragment;
     GLuint vertex;
+    GLuint geometry;
     uint8_t numShaders;
 }VG_shader_packet;
 
