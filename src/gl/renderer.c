@@ -147,9 +147,10 @@ void renderLoop(GLFWwindow* win)
 
         if(glfwGetKey(win, GLFW_KEY_ENTER ) == GLFW_PRESS)
         {
-            idx = !idx;
+            /*idx = !idx;
             id = arena->modelHandlePool[idx];
-            printf("IDX: %d\n", idx);
+            printf("IDX: %d\n", idx);*/
+            transitionScene();
         }
 
         glUseProgram(shaderProgram);
