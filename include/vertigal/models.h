@@ -5,6 +5,8 @@
 #include <cglm/vec2.h>
 #include <cglm/ivec3.h>
 
+#include "vertigal/arena.h"
+
 #define VG_OBJ_LINE_SIZE sizeof(VG_OBJ_LINE_t)
 #define OBJ_VERTEX_ID 0x2076
 #define OBJ_TEX_ID 0x6E76
@@ -35,7 +37,7 @@ typedef struct{
     VG_3D_MODEL_GROUPS groups;
 }VG_3D_ENTITY;
 
-VG_3D_ENTITY* loadModelFromObj(const char* restrict path);
+vertigal_handle* loadModelFromObj(const char* restrict path);
 
 
 #endif 

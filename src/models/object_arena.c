@@ -69,7 +69,7 @@ vertigal_handle objectArenaAddModel(vec3* vertexBuffer, uint32_t vBufferSize, in
 
     handle->allocated = true;
     handle->indexLen = iBufferSize;
-    handle->verticesSLen = vBufferSize;
+    handle->verticesLen = vBufferSize;
 
     //if it is our first allocation
     if(returnHandle == 0)
@@ -81,7 +81,7 @@ vertigal_handle objectArenaAddModel(vec3* vertexBuffer, uint32_t vBufferSize, in
         prevHandle = &arena.modelHandlePool[returnHandle - 1];
 
         handle->indexStart = prevHandle->indexStart + prevHandle->indexLen + 1;
-        handle->verticesStart = prevHandle->verticesStart + prevHandle->verticesSLen;
+        handle->verticesStart = prevHandle->verticesStart + prevHandle->verticesLen;
 
         /*for (uint32_t indexCursor = 0; indexCursor < iBufferSize; indexCursor++)
         {

@@ -173,7 +173,7 @@ VG_3D_ENTITY* modelLineParser(file_buffer_t file)
 
 }
 
-VG_3D_ENTITY* loadModelFromObj(const char* restrict path)
+vertigal_handle* loadModelFromObj(const char* restrict path)
 {
     size_t bufferLen;
     uint8_t result;
@@ -187,7 +187,5 @@ VG_3D_ENTITY* loadModelFromObj(const char* restrict path)
 
     initObjectArena(500, 500);
 
-    objectArenaAddModel(entptr->vertexArray, entptr->attribs.numVertices, entptr->faceIndices, entptr->attribs.numFaces);
-    
-    return entptr;
+    return objectArenaAddModel(entptr->vertexArray, entptr->attribs.numVertices, entptr->faceIndices, entptr->attribs.numFaces);
 }

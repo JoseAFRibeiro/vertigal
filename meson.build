@@ -63,6 +63,9 @@ src = [
     'src/io/imageloader.c',
     'src/models/objmodel.c',
     'src/models/object_arena.c',
+    'src/scenes/transition.c',
+    'src/scenes/scenetree.c',
+    
 ]
 
 

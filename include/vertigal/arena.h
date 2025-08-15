@@ -13,7 +13,7 @@ typedef struct {
     int32_t indexStart;
     int32_t indexLen;
     int32_t verticesStart;
-    int32_t verticesSLen;
+    int32_t verticesLen;
     bool allocated;
 }VERTIGAL_ARENA_MODEL_IDENTIFIER;
 

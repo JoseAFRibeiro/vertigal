@@ -10,6 +10,7 @@
 #include "cglm/cam.h"
 #include "cglm/affine.h"
 #include "vertigal/arena.h"
+#include "vertigal/scene.h"
 
 GLint shaderProgram;
 GLint shaderProgram2;
@@ -84,12 +85,11 @@ void renderLoop(GLFWwindow* win)
 
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, (arena->sizeIndexes - arena->freeIndexes) * sizeof(uint32_t), arena->indexes, GL_STATIC_DRAW);
-    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, (arena->sizeIndexes - arena->freeIndexes) * sizeof(uint32_t), arena->indexes, GL_STATIC_DRAW);
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * (arena->sizeVertices - arena->freeVertices), arena->vertices, GL_STATIC_DRAW);
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * (arena->sizeVertices - arena->freeVertices), arena->vertices, GL_STATIC_DRAW);
 
     glGenVertexArrays(1, &VAO);
     glGenVertexArrays(1, &VAO2);
@@ -99,7 +99,7 @@ void renderLoop(GLFWwindow* win)
     glEnableVertexAttribArray(0);
 
     glBindVertexArray(VAO2);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) (id.verticesSLen * sizeof(vec3)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) (id.verticesLen * sizeof(vec3)));
     glEnableVertexAttribArray(0);
 
     /*Temporary triangle transform*/
@@ -139,6 +139,13 @@ void renderLoop(GLFWwindow* win)
     vec3 cubeTranslate = {10.0f, 0.0f, 0.0f};
     glm_translate(cubeTransform, cubeTranslate);
 
+    //set the scene
+
+    SceneTree* tree = createSceneTree();
+    setTree(tree);
+    populateTree();
+    setCurrentSceneToRoot();
+
     glDisable(GL_CULL_FACE);
     while(!glfwWindowShouldClose(win))
     {   
@@ -150,7 +157,10 @@ void renderLoop(GLFWwindow* win)
             /*idx = !idx;
             id = arena->modelHandlePool[idx];
             printf("IDX: %d\n", idx);*/
-            transitionScene();
+            transitionScene(&tree->root->children[0]);
+        } else if (glfwGetKey(win, GLFW_KEY_BACKSPACE) == GLFW_PRESS)
+        {
+            setCurrentSceneToRoot();
         }
 
         glUseProgram(shaderProgram);

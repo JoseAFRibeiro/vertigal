@@ -9,8 +9,9 @@ typedef struct
     char name[128];
     struct SceneNode** children;    
     struct SceneNode* parent;
-    float *vertices;
-    uint32_t *indices;
+    uint64_t verticesStart, verticesLen;
+    uint64_t indicesStart, indicesLen;
+    GLuint shader;
 
 }SceneNode;
 
@@ -20,5 +21,9 @@ typedef struct
     uint16_t numNodes;
 }SceneTree;
 
+SceneTree* createSceneTree();
+
+void transitionScene(SceneNode* newScene);
+void setTree(SceneTree* t);
 
 #endif
