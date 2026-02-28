@@ -36,8 +36,8 @@ void vertexHandler(float* results, const char* restrict line)
             stringCursor++;
             vertexCursor++;
         }
-        
-        results[resultCursor]  = strtof(floatString, &floatString[stringCursor]);
+        char* endChar = &floatString[stringCursor];
+        results[resultCursor]  = strtof(floatString, &endChar);
         memset(floatString, 0, 1024);
         stringCursor = 0;
         resultCursor++;
@@ -75,7 +75,8 @@ void faceHandler(int32_t* results, const char* restrict line)
             stringCursor++;
         }
 
-        results[resultCursor] = strtol(indexString, &indexString[stringCursor], 10);
+        char* endChar = &indexString[stringCursor];
+        results[resultCursor] = strtol(indexString, &endChar, 10);
         resultCursor++;
         stringCursor = 0;
         memset(indexString, 0, 1024);
@@ -173,7 +174,7 @@ VG_3D_ENTITY* modelLineParser(file_buffer_t file)
 
 }
 
-vertigal_handle* loadModelFromObj(const char* restrict path)
+vertigal_handle loadModelFromObj(const char* restrict path)
 {
     size_t bufferLen;
     uint8_t result;

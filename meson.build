@@ -44,7 +44,7 @@ if sys == 'windows'
     include += cglm_path / 'include'
 
     glfw_dep = compiler.find_library('glfw3', dirs: glfw_path / glfw_lib, static: true)
-    cglm_dep = compiler.find_library('cglm', dirs: cglm_path / cglm_lib)
+    cglm_dep = compiler.find_library('cglm', dirs: cglm_path / cglm_lib, static: true)
 endif
 
 src = [

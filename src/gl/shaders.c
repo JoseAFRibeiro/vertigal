@@ -23,7 +23,7 @@ GLuint compileShader(const char* path, GLenum shaderType)
     
     shader =  glCreateShader(shaderType);
 
-    glShaderSource(shader, 1, &buffer, NULL);
+    glShaderSource(shader, 1, (const GLchar * const *)&buffer, NULL);
     glCompileShader(shader);
 
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logSize);

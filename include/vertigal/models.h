@@ -37,7 +37,7 @@ typedef struct{
     VG_3D_MODEL_GROUPS groups;
 }VG_3D_ENTITY;
 
-vertigal_handle* loadModelFromObj(const char* restrict path);
+vertigal_handle loadModelFromObj(const char* restrict path);
 
 
 #endif 

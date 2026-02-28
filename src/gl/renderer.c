@@ -64,21 +64,34 @@ unsigned int indices[] = {
 
 void renderLoop(GLFWwindow* win)
 {
-    VG_3D_ENTITY* model1 = {0};
-    VG_3D_ENTITY* model2 = {0};
+    vertigal_handle model1 = 0;
+    vertigal_handle model2 = 0;
     uint32_t VBO, VAO, VAO2, EBO, VBO2, EBO2;
     //guiInit(win);
     int idx = 0;
+
+    VG_PLAYER_CAMERA cam = cameraSetup();
+
     model1 = loadModelFromObj("./res/cube.obj");
     model2 = loadModelFromObj("./res/cow.obj");
 
-
+    VERTIGAL_SCENE_ARENA* scenes = createScene(32, &cam);
     VERTIGAL_MODEL_ARENA* arena = getArenaptr();
     
     VERTIGAL_ARENA_MODEL_IDENTIFIER id = arena->modelHandlePool[idx];
     VERTIGAL_ARENA_MODEL_IDENTIFIER id2 = arena->modelHandlePool[idx+1];
 
     VERTIGAL_ARENA_MODEL_IDENTIFIER id_arr[2] = {id, id2};
+
+    SceneNode node1 = {
+        .name = "cow",
+        .program = shaderProgram,
+        .children = {0,0,0,0}
+    };
+
+    node1.nodeID = model1;
+
+    addNodeToScene(scenes->root, node1.nodeID, scenes);
     
     //if(cube == NULL) return;
     glUseProgram(shaderProgram);
@@ -109,7 +122,6 @@ void renderLoop(GLFWwindow* win)
     /*Temporary triangle transform*/
     
     /*Temporary camera transform*/
-    VG_PLAYER_CAMERA cam = cameraSetup();
     GLint cameraTransformLoc = glGetUniformLocation(shaderProgram, "view");
     /*Temporary camera transform*/
 
@@ -140,13 +152,10 @@ void renderLoop(GLFWwindow* win)
     glm_translate(cubeTransform, cubeTranslate);
 
     //set the scene
+    transitionScene(scenes, arena);
 
-    SceneTree* tree = createSceneTree();
-    setTree(tree);
-    populateTree();
-    setCurrentSceneToRoot();
+    SceneTree* tree = scenes->tree;
 
-    glDisable(GL_CULL_FACE);
     while(!glfwWindowShouldClose(win))
     {   
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -154,16 +163,12 @@ void renderLoop(GLFWwindow* win)
 
         if(glfwGetKey(win, GLFW_KEY_ENTER ) == GLFW_PRESS)
         {
-            /*idx = !idx;
-            id = arena->modelHandlePool[idx];
-            printf("IDX: %d\n", idx);*/
-            transitionScene(&tree->root->children[0]);
         } else if (glfwGetKey(win, GLFW_KEY_BACKSPACE) == GLFW_PRESS)
         {
             setCurrentSceneToRoot();
         }
 
-        glUseProgram(shaderProgram);
+        /*glUseProgram(shaderProgram);
 
         objectTransformLoc = glGetUniformLocation(shaderProgram, "model");
         cameraTransformLoc = glGetUniformLocation(shaderProgram, "view");
@@ -219,6 +224,6 @@ void renderLoop(GLFWwindow* win)
 
         //guiRender(win);
 
-        glfwSwapBuffers(win);
+        glfwSwapBuffers(win);*/
     }
 }
