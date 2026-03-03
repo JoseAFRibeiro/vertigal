@@ -35,4 +35,5 @@ void freeObjectArena();
 void initObjectArena(uint64_t initialSizeVertex, uint64_t initialSizeIndex);
 VERTIGAL_MODEL_ARENA* getArenaptr();
 
+
 #endif

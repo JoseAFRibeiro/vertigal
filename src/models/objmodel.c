@@ -102,7 +102,7 @@ VG_3D_ENTITY* modelLineParser(file_buffer_t file)
 
 
     ent = malloc(sizeof(VG_3D_ENTITY));
-    //wasteful, fix later
+    //TODO: wasteful, fix later
     ent->vertexArray = malloc(500000 * sizeof(vec3));
     ent->faceIndices = malloc(10000000 * (sizeof(int32_t) * 3));
 

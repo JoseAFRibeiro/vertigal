@@ -138,7 +138,7 @@ void renderLoop(GLFWwindow* win)
     vec3 cowColor = {1.0f, 0.5f, 0.31f};
 
     GLint lightUniformLocation = glGetUniformLocation(shaderProgram, "lightColor");
-    GLint objectColorUniformLocation = glGetUniformLocation(shaderProgram2, "objectColor");
+    GLint objectColorUniformLocation = glGetUniformLocation(shaderProgram, "objectColor");
     /*temporary light and cow color*/
 
     glfwSwapInterval(1);
@@ -155,11 +155,19 @@ void renderLoop(GLFWwindow* win)
     transitionScene(scenes, arena);
 
     SceneTree* tree = scenes->tree;
+    tree->arenaID = scenes->root;
+    SceneStack* renderStack;
+    createRenderStack(&renderStack, 32);
+    buildRenderStack(tree, *renderStack, scenes, arena );
 
     while(!glfwWindowShouldClose(win))
     {   
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glfwPollEvents();
+
+        glEnable(GL_DEPTH_TEST);
+        glClearColor(0.50f, 0.70f, 0.40f, 1.0f);
+        
 
         if(glfwGetKey(win, GLFW_KEY_ENTER ) == GLFW_PRESS)
         {
@@ -176,9 +184,7 @@ void renderLoop(GLFWwindow* win)
         lightUniformLocation = glGetUniformLocation(shaderProgram, "lightColor");
         objectColorUniformLocation = glGetUniformLocation(shaderProgram, "objectColor");
 
-        glEnable(GL_DEPTH_TEST);
-        glClearColor(0.50f, 0.70f, 0.40f, 1.0f);
-        
+
         moveCamera(&cam, win);
         //setPosition(cam.cameraPosition);
         glUniformMatrix4fv(projectionTransformLoc, 1, GL_FALSE, (float *) projection);
@@ -195,7 +201,7 @@ void renderLoop(GLFWwindow* win)
         glDrawElements(GL_TRIANGLES, id_arr[0].indexLen, GL_UNSIGNED_INT, (void*) (id_arr[0].indexStart * sizeof(int32_t)));
         glDisableVertexAttribArray(0);
 
-        glm_spinned(cowTransform, glm_rad(0.3f), cam.__cameraUp);
+        glm_spinneindex of our node in the memory arenad(cowTransform, glm_rad(0.3f), cam.__cameraUp);
         
         glUseProgram(shaderProgram2);
 
@@ -223,7 +229,7 @@ void renderLoop(GLFWwindow* win)
         glDisableVertexAttribArray(0);
 
         //guiRender(win);
-
-        glfwSwapBuffers(win);*/
+        */
+        glfwSwapBuffers(win);
     }
 }

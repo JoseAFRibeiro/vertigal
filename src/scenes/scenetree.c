@@ -10,14 +10,13 @@ static SceneTree* tree;
 static inline uint32_t getArenaSlot(VERTIGAL_SCENE_ARENA* arena);
 static inline SceneNode* getNodeByHandle(uint32_t handle, VERTIGAL_SCENE_ARENA* arena);
 
-
 VERTIGAL_SCENE_ARENA* createScene(uint32_t numNodes, VG_PLAYER_CAMERA *cam)
 {   
     VERTIGAL_SCENE_ARENA* arena;
     arena = malloc(sizeof(VERTIGAL_SCENE_ARENA));
     memset(arena, 0, sizeof(VERTIGAL_SCENE_ARENA));
     initSceneGraphArena(numNodes, arena, cam);
-
+    arena->root = getArenaSlot(arena);
     return arena;
 }
 
@@ -35,7 +34,7 @@ uint32_t addNodeToScene(uint32_t parent, uint32_t child, VERTIGAL_SCENE_ARENA* a
     {
 
 
-        if(_parent->children[i] == NULL)
+        if(_parent->children[i] == 0)
         {   
             _appendedNode->nodeID = _child->nodeID;
             _appendedNode->parent = parent;
@@ -45,6 +44,7 @@ uint32_t addNodeToScene(uint32_t parent, uint32_t child, VERTIGAL_SCENE_ARENA* a
             
             _parent->children[i] = _appendedNode->nodeID;
             arena->tree->numNodes++;
+            break;
         }   
     }
     
@@ -62,14 +62,14 @@ void initSceneGraphArena(uint32_t numNodes, VERTIGAL_SCENE_ARENA* arena, VG_PLAY
         return;
 
     arena->nodePool = malloc(numNodes * sizeof(SceneNode) + sizeof(SceneRoot));
+    memset(arena->nodePool, 0,numNodes * sizeof(SceneNode) + sizeof(SceneRoot));
     arena->arenaSize = numNodes;
     arena->arenaUsed = 0;
     arena->root = getArenaSlot(arena);
     arena->arenaUsed +=1;
     arena->tree = malloc(sizeof(SceneTree));
+    memset(arena->tree, 0, sizeof(SceneTree));
     memcpy(&arena->tree->root.type.camera, cam, sizeof(VG_PLAYER_CAMERA));
-    memset(arena->slotInUse, false, sizeof(arena->slotInUse));       
-
     //TODO: check allocations
 
     arena->initialized = true;
@@ -93,12 +93,13 @@ static inline uint32_t getArenaSlot(VERTIGAL_SCENE_ARENA* arena)
             return 0;
         }
     }
+    arena->slotInUse[i] = true;
     return i;
 }
 
 static inline SceneNode* getNodeByHandle(uint32_t handle, VERTIGAL_SCENE_ARENA* arena)
 {
-    return &arena->nodePool[handle];
+    return &(*arena).nodePool[handle];
 }
 
 /*
@@ -106,15 +107,20 @@ static inline SceneNode* getNodeByHandle(uint32_t handle, VERTIGAL_SCENE_ARENA* 
     Make a stack for parsing by the renderer
 */
 
-void createRenderStack(SceneStack* sceneStack, int32_t size)
+void createRenderStack(SceneStack** restrict sceneStack, int32_t size)
 {
-    sceneStack = malloc(sizeof(sceneStack));
+    *sceneStack = calloc(1, sizeof(SceneStack));
 
     if(sceneStack == NULL) return ;
 
-    sceneStack->nodeIndex = malloc(sizeof(int32_t) * size);
+    (*sceneStack)->nodeIndex = malloc(sizeof(int32_t) * size);
+    (*sceneStack)->nodeFaceIndexStart = malloc(sizeof(int32_t) * size);
+    (*sceneStack)->nodeFaceIndexCount = malloc(sizeof(int32_t) * size);
     
-    if (sceneStack->nodeIndex == NULL) return;
+    if ((*sceneStack)->nodeIndex == NULL) return;
+    if ((*sceneStack)->nodeFaceIndexStart == NULL) return;
+    if ((*sceneStack)->nodeFaceIndexCount == NULL) return;
+
     
     return;
 }
@@ -129,12 +135,38 @@ void decreaseRenderStack(SceneStack* sceneStack)
     return;
 }
 
-void walkSceneTree()
+void addToStack(SceneStack stack, SceneNode node, VERTIGAL_MODEL_ARENA* modelArena)
 {
+    vertigal_handle modelArenaHandle = node.modelArenaID;
+    uint32_t lenFaces = 0;
+    uint32_t startFaces = 0;
+
+    lenFaces = modelArena->modelHandlePool[modelArenaHandle].indexLen;
+    startFaces = modelArena->modelHandlePool[modelArenaHandle].indexStart;
+
+    stack.nodeFaceIndexCount[stack.nodes] = lenFaces;
+    stack.nodeFaceIndexStart[stack.nodes] = startFaces; 
+    stack.nodes++;
     return;
 }
 
-void buildRenderStack(SceneTree* tree, SceneStack stack)
+void walkSceneTree(SceneNode node, uint16_t count, VERTIGAL_SCENE_ARENA* arena, SceneStack stack, VERTIGAL_MODEL_ARENA* modelArena)
+{   
+
+    for(uint8_t i = 0; i <= 3; i++)
+    {
+        if(node.children[i] > 0)
+        {
+            walkSceneTree(*getNodeByHandle(node.modelArenaID, arena), ++count, arena, stack, modelArena);
+        } else{
+            addToStack(stack, node, modelArena);            
+        }
+    }
+
+    return;
+}
+
+void buildRenderStack(SceneTree* tree, SceneStack stack, VERTIGAL_SCENE_ARENA* arena, VERTIGAL_MODEL_ARENA* modelArena)
 {
     /**
      * //TODO:
@@ -142,6 +174,11 @@ void buildRenderStack(SceneTree* tree, SceneStack stack)
      *  - Put the nodes to be rendered in a list
      *  - Send that list to the renderer 
      *  */ 
-
+    
+    for(uint8_t i = 0; i <= 3; i++)
+    {
+        walkSceneTree(*getNodeByHandle(tree->root.children[i], arena), 0, arena, stack, modelArena);
+    }    
+    
     return;
 }

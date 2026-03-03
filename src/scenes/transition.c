@@ -25,7 +25,7 @@ void setCurrentSceneToRoot()
     
     if(tree->root.children[0] != NULL)
     {
-        currentNode = tree->root.children[0];
+       // currentNode = tree->root.children[0];
     } else {
         return;
     }

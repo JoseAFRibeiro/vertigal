@@ -22,12 +22,13 @@ typedef struct
     uint32_t children[4];    
     uint32_t parent; 
     vertigal_handle nodeID;
+    vertigal_handle modelArenaID;
     GLuint program;
 }SceneNode;
 
 typedef struct
 {
-    SceneNode* children[4];     
+    uint32_t children[4];     
     union RootType type;
     GLuint program;
 }SceneRoot;
@@ -35,6 +36,7 @@ typedef struct
 typedef struct
 {
     SceneRoot root;
+    vertigal_handle arenaID;
     uint32_t numNodes;
     uint64_t verticesStart[128];
     uint64_t verticesLen[128];
@@ -59,6 +61,8 @@ typedef struct
 {
     uint32_t nodes; //number of nodes in the stack
     uint32_t* nodeIndex; //index of our node in the memory arena
+    uint32_t* nodeFaceIndexStart; //start position of the indices in GPU memory
+    uint16_t* nodeFaceIndexCount; //length of the indices in GPU memory
 
 }SceneStack;
 
@@ -69,4 +73,8 @@ void initSceneGraphArena(uint32_t numNodes, VERTIGAL_SCENE_ARENA* arena, VG_PLAY
 void transitionScene(VERTIGAL_SCENE_ARENA* newScene, VERTIGAL_MODEL_ARENA* models);
 void setTree(SceneTree* t);
 void setCurrentSceneToRoot();
+void buildRenderStack(SceneTree* tree, SceneStack stack, VERTIGAL_SCENE_ARENA* arena, VERTIGAL_MODEL_ARENA* modelArena);
+void createRenderStack(SceneStack** restrict sceneStack, int32_t size);
+
+
 #endif
