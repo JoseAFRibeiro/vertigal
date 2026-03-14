@@ -73,7 +73,7 @@ void initSceneGraphArena(uint32_t numNodes, VERTIGAL_SCENE_ARENA* arena, VG_PLAY
 void transitionScene(VERTIGAL_SCENE_ARENA* newScene, VERTIGAL_MODEL_ARENA* models);
 void setTree(SceneTree* t);
 void setCurrentSceneToRoot();
-void buildRenderStack(SceneTree* tree, SceneStack stack, VERTIGAL_SCENE_ARENA* arena, VERTIGAL_MODEL_ARENA* modelArena);
+void buildRenderStack(SceneTree* tree, SceneStack* stack, VERTIGAL_SCENE_ARENA* arena, VERTIGAL_MODEL_ARENA* modelArena);
 void createRenderStack(SceneStack** restrict sceneStack, int32_t size);
 
 

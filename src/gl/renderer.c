@@ -158,7 +158,7 @@ void renderLoop(GLFWwindow* win)
     tree->arenaID = scenes->root;
     SceneStack* renderStack;
     createRenderStack(&renderStack, 32);
-    buildRenderStack(tree, *renderStack, scenes, arena );
+    buildRenderStack(tree, renderStack, scenes, arena );
 
     while(!glfwWindowShouldClose(win))
     {   
@@ -175,8 +175,8 @@ void renderLoop(GLFWwindow* win)
         {
             setCurrentSceneToRoot();
         }
-
-        /*glUseProgram(shaderProgram);
+        
+        glUseProgram(shaderProgram);
 
         objectTransformLoc = glGetUniformLocation(shaderProgram, "model");
         cameraTransformLoc = glGetUniformLocation(shaderProgram, "view");
@@ -186,6 +186,35 @@ void renderLoop(GLFWwindow* win)
 
 
         moveCamera(&cam, win);
+        //setPosition(cam.cameraPosition);
+        glUniformMatrix4fv(projectionTransformLoc, 1, GL_FALSE, (float *) projection);
+        glUniformMatrix4fv(cameraTransformLoc, 1, GL_FALSE, (float *) cam.lookat);
+        glUniform3fv(lightUniformLocation, 1, (float *) light);
+        glUniformMatrix4fv(objectTransformLoc, 1, GL_FALSE, (float *) cubeTransform);
+
+
+
+        glBindVertexArray(VAO);
+        glEnableVertexAttribArray(0);        
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+        moveCamera(&cam, win);
+
+        for (size_t i = 0; i < renderStack->nodes; i++)
+        {   
+            glDrawElements(GL_TRIANGLES, renderStack->nodeFaceIndexCount[i], GL_UNSIGNED_INT, (void *) renderStack->nodeFaceIndexStart[i]);   
+        }
+    
+        /*
+
+        objectTransformLoc = glGetUniformLocation(shaderProgram, "model");
+        cameraTransformLoc = glGetUniformLocation(shaderProgram, "view");
+        projectionTransformLoc = glGetUniformLocation(shaderProgram, "projection");
+        lightUniformLocation = glGetUniformLocation(shaderProgram, "lightColor");
+        objectColorUniformLocation = glGetUniformLocation(shaderProgram, "objectColor");
+
+
         //setPosition(cam.cameraPosition);
         glUniformMatrix4fv(projectionTransformLoc, 1, GL_FALSE, (float *) projection);
         glUniformMatrix4fv(cameraTransformLoc, 1, GL_FALSE, (float *) cam.lookat);

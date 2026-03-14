@@ -113,9 +113,9 @@ void createRenderStack(SceneStack** restrict sceneStack, int32_t size)
 
     if(sceneStack == NULL) return ;
 
-    (*sceneStack)->nodeIndex = malloc(sizeof(int32_t) * size);
-    (*sceneStack)->nodeFaceIndexStart = malloc(sizeof(int32_t) * size);
-    (*sceneStack)->nodeFaceIndexCount = malloc(sizeof(int32_t) * size);
+    (*sceneStack)->nodeIndex = calloc( size, sizeof(int32_t));
+    (*sceneStack)->nodeFaceIndexStart = calloc(size, sizeof(int32_t));
+    (*sceneStack)->nodeFaceIndexCount = calloc(size, sizeof(int32_t));
     
     if ((*sceneStack)->nodeIndex == NULL) return;
     if ((*sceneStack)->nodeFaceIndexStart == NULL) return;
@@ -135,7 +135,7 @@ void decreaseRenderStack(SceneStack* sceneStack)
     return;
 }
 
-void addToStack(SceneStack stack, SceneNode node, VERTIGAL_MODEL_ARENA* modelArena)
+void addToStack(SceneStack* stack, SceneNode node, VERTIGAL_MODEL_ARENA* modelArena)
 {
     vertigal_handle modelArenaHandle = node.modelArenaID;
     uint32_t lenFaces = 0;
@@ -144,13 +144,13 @@ void addToStack(SceneStack stack, SceneNode node, VERTIGAL_MODEL_ARENA* modelAre
     lenFaces = modelArena->modelHandlePool[modelArenaHandle].indexLen;
     startFaces = modelArena->modelHandlePool[modelArenaHandle].indexStart;
 
-    stack.nodeFaceIndexCount[stack.nodes] = lenFaces;
-    stack.nodeFaceIndexStart[stack.nodes] = startFaces; 
-    stack.nodes++;
+    stack->nodeFaceIndexCount[stack->nodes] = lenFaces;
+    stack->nodeFaceIndexStart[stack->nodes] = startFaces; 
+    stack->nodes++;
     return;
 }
 
-void walkSceneTree(SceneNode node, uint16_t count, VERTIGAL_SCENE_ARENA* arena, SceneStack stack, VERTIGAL_MODEL_ARENA* modelArena)
+void walkSceneTree(SceneNode node, uint16_t count, VERTIGAL_SCENE_ARENA* arena, SceneStack* stack, VERTIGAL_MODEL_ARENA* modelArena)
 {   
 
     for(uint8_t i = 0; i <= 3; i++)
@@ -166,7 +166,7 @@ void walkSceneTree(SceneNode node, uint16_t count, VERTIGAL_SCENE_ARENA* arena, 
     return;
 }
 
-void buildRenderStack(SceneTree* tree, SceneStack stack, VERTIGAL_SCENE_ARENA* arena, VERTIGAL_MODEL_ARENA* modelArena)
+void buildRenderStack(SceneTree* tree, SceneStack* stack, VERTIGAL_SCENE_ARENA* arena, VERTIGAL_MODEL_ARENA* modelArena)
 {
     /**
      * //TODO:

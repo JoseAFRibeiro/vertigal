@@ -8,6 +8,7 @@ GLFWwindow* glInit(void)
 
     #ifdef DEBUG
     glfwSetErrorCallback(errorCallback);
+    glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
     #endif
 
     if(!glfwInit())
@@ -19,8 +20,9 @@ GLFWwindow* glInit(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE); 
-
+    #ifdef DEBUG
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+    #endif
     win = glfwCreateWindow(1920, 1080, "Vertigal", NULL, NULL);
 
     if(win == NULL)
